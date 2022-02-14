@@ -5,10 +5,7 @@ import livereload from "rollup-plugin-livereload";
 import { terser } from "rollup-plugin-terser";
 import svg from "rollup-plugin-svg";
 import typescript from "@rollup/plugin-typescript";
-
-import postcss from "rollup-plugin-postcss";
-import cssnano from "cssnano";
-
+import sveltePreprocess from "svelte-preprocess";
 import htmlBundle from "rollup-plugin-html-bundle";
 
 const production = !process.env.ROLLUP_WATCH;
@@ -19,14 +16,18 @@ export default [
     output: {
       format: "iife",
       name: "ui",
-      file: "build/bundle.js",
+      file: "public/build/bundle.js",
     },
     plugins: [
       svelte({
         dev: !production,
+        preprocess: sveltePreprocess({
+          sourceMap: !production,
+        }),
+        compilerOptions: {
+          dev: !production,
+        },
       }),
-
-      // https://github.com/rollup/plugins/tree/master/packages/commonjs
       resolve({
         browser: true,
         dedupe: (importee) =>
@@ -35,10 +36,6 @@ export default [
       }),
       commonjs(),
       svg(),
-      postcss({
-        extensions: [".css"],
-        plugins: [cssnano()],
-      }),
       htmlBundle({
         template: "src/index.html",
         target: "public/index.html",
