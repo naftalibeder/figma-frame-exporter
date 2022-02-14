@@ -2,9 +2,9 @@
   "name": "Export",
   "id": "1074101625913782131",
   "api": "1.0.0",
-  "main": "dist/code.js",
+  "main": "public/main.js",
   "editorType": [
     "figma"
   ],
-  "ui": "ui.html"
+  "ui": "public/index.html"
 }
