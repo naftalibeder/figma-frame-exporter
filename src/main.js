@@ -14,14 +14,16 @@ const buildMap = () => {
         }
     }
 };
-figma.ui.onmessage = (msg) => {
-    if (msg.type === "init") {
+figma.ui.onmessage = (message) => {
+    const type = message.type;
+    if (type === "init") {
         buildMap();
+        figma.ui.postMessage({ type: "nodes", count: 5 });
     }
-    else if (msg.type === "export") {
+    else if (type === "export") {
         figma.closePlugin();
     }
-    else if (msg.type === "cancel") {
+    else if (type === "cancel") {
         figma.closePlugin();
     }
 };
