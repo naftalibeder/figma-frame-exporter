@@ -1,0 +1,15 @@
+{
+  "name": "export",
+  "version": "1.0.0",
+  "description": "Export images and variants with configurable filenames",
+  "main": "code.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.42.1",
+    "typescript": "^4.5.5"
+  }
+}
