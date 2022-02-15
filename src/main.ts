@@ -39,6 +39,20 @@ const getExportables = () => {
   return exportables;
 };
 
+const replacingFormatStr = (
+  filename: string,
+  match: "f" | "p" | "v",
+  replacement?: string
+) => {
+  const re = new RegExp(`{(.?)${match}}`);
+  if (replacement) {
+    filename = filename.replace(re, `$1${replacement}`);
+  } else {
+    filename = filename.replace(re, "");
+  }
+  return filename;
+};
+
 const getAssets = async (
   exportables: readonly Exportable[],
   format: string
@@ -47,13 +61,14 @@ const getAssets = async (
 
   exportables.forEach(async (exportable) => {
     const node = figma.getNodeById(exportable.id) as SceneNode;
-    let filename = format.replace("{f}", exportable.parentName);
-    if (exportable.variantProperty) {
-    }
-    if (exportable.variantValue) {
-      filename = filename.replace(/\{.*v\}/, exportable.variantValue);
-    }
+
+    let filename = format;
+    filename = replacingFormatStr(filename, "f", exportable.parentName);
+    filename = replacingFormatStr(filename, "p", exportable.variantProperty);
+    filename = replacingFormatStr(filename, "v", exportable.variantValue);
+
     console.log(filename);
+
     const data = await (<ExportMixin>node).exportAsync({ format: "PNG" });
     assets.push({ filename, data });
   });

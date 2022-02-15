@@ -4,7 +4,7 @@
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
 
   let nodeCount = 0;
-  let format = "{f}.{v}";
+  let format = "{f}{.v}";
 
   onMount(() => {
     parent.postMessage({ pluginMessage: { type: "init" } }, "*");
@@ -52,7 +52,7 @@
 
 <div class="wrap">
   <Section>Format</Section>
-  <Input type="text" on:keydown={onChangeFormat} bind:value={format} />
+  <Input on:keydown={onChangeFormat} bind:value={format} />
 
   <div>
     <Label

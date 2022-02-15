@@ -24,16 +24,24 @@ const getExportables = () => {
     }
     return exportables;
 };
+const replacingFormatStr = (filename, match, replacement) => {
+    const re = new RegExp(`{(.?)${match}}`);
+    if (replacement) {
+        filename = filename.replace(re, `$1${replacement}`);
+    }
+    else {
+        filename = filename.replace(re, "");
+    }
+    return filename;
+};
 const getAssets = async (exportables, format) => {
     let assets = [];
     exportables.forEach(async (exportable) => {
         const node = figma.getNodeById(exportable.id);
-        let filename = format.replace("{f}", exportable.parentName);
-        if (exportable.variantProperty) {
-        }
-        if (exportable.variantValue) {
-            filename = filename.replace(/\{.*v\}/, exportable.variantValue);
-        }
+        let filename = format;
+        filename = replacingFormatStr(filename, "f", exportable.parentName);
+        filename = replacingFormatStr(filename, "p", exportable.variantProperty);
+        filename = replacingFormatStr(filename, "v", exportable.variantValue);
         console.log(filename);
         const data = await node.exportAsync({ format: "PNG" });
         assets.push({ filename, data });
