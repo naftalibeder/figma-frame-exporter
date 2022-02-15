@@ -51,8 +51,11 @@
 </script>
 
 <div class="wrap">
-  <Section>Format</Section>
-  <Input on:keydown={onChangeFormat} bind:value={format} />
+  <Input
+    placeholder="Enter a format"
+    on:keydown={onChangeFormat}
+    bind:value={format}
+  />
 
   <div>
     <Label
@@ -64,7 +67,6 @@
   </div>
 
   <div class="button-holder">
-    <Button variant="secondary" on:click={onSelectCancel}>Cancel</Button>
     <Button on:click={onSelectExport} disabled={nodeCount === 0}
       >Export {nodeCount} images</Button
     >
@@ -77,14 +79,11 @@
     flex: 1;
     flex-direction: column;
     gap: 8px;
-    padding: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
     font-size: small;
   }
   .button-holder {
-    display: flex;
-    flex: 1;
-    flex-direction: row;
     padding: 8px;
-    gap: 8px;
   }
 </style>

@@ -1,4 +1,4 @@
-figma.showUI(__html__, { width: 280, height: 240 });
+figma.showUI(__html__, { width: 240, height: 180 });
 
 interface Exportable {
   id: string;
