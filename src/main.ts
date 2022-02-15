@@ -1,6 +1,12 @@
-figma.showUI(__html__, { width: 300, height: 400 });
+figma.showUI(__html__, { width: 300, height: 500 });
 
 type Casing = "lower" | "upper" | "title";
+
+interface Config {
+  format: string;
+  connector: string;
+  casing: Casing;
+}
 
 interface Variant {
   property: string;
@@ -68,10 +74,10 @@ const cased = (value: string, casing: Casing) => {
 
 const getAssets = async (
   exportables: readonly Exportable[],
-  format: string,
-  connector: string,
-  casing: Casing
+  config: Config
 ) => {
+  const { format, connector, casing } = config;
+
   let assets: Asset[] = [];
 
   exportables.forEach(async (exportable) => {
@@ -96,27 +102,44 @@ const getAssets = async (
   return assets;
 };
 
-figma.on("selectionchange", () => {
+const refreshUI = async (config?: Config) => {
   const exportables = getExportables();
-  figma.ui.postMessage({ type: "nodes", count: exportables.length });
+
+  let example: string[] = [];
+  if (config) {
+    const assets = await getAssets(exportables, config);
+    example = assets.map((a) => a.filename);
+  }
+
+  figma.ui.postMessage({
+    type: "refresh",
+    nodeCount: exportables.length,
+    example,
+  });
+};
+
+figma.on("selectionchange", () => {
+  refreshUI();
 });
 
 figma.ui.onmessage = async (message) => {
   const type = message.type;
 
   if (type === "init") {
-    const exportables = getExportables();
-    figma.ui.postMessage({ type: "nodes", count: exportables.length });
-  } else if (type === "format") {
-    // TODO
+    refreshUI();
+  } else if (type === "config") {
+    refreshUI({
+      format: message.format,
+      connector: message.connector,
+      casing: message.casing,
+    });
   } else if (type === "export") {
     const exportables = getExportables();
-    const assets = await getAssets(
-      exportables,
-      message.format,
-      message.connector,
-      message.casing
-    );
+    const assets = await getAssets(exportables, {
+      format: message.format,
+      connector: message.connector,
+      casing: message.casing,
+    });
     figma.ui.postMessage({ type: "export", assets });
   } else if (type === "cancel") {
     figma.closePlugin();

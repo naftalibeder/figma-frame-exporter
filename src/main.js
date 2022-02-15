@@ -1,4 +1,4 @@
-figma.showUI(__html__, { width: 300, height: 400 });
+figma.showUI(__html__, { width: 300, height: 500 });
 const getExportables = () => {
     const nodes = figma.currentPage.selection;
     const exportables = [];
@@ -43,7 +43,8 @@ const cased = (value, casing) => {
         return value.slice(0, 1).toUpperCase() + value.slice(1).toLowerCase();
     }
 };
-const getAssets = async (exportables, format, connector, casing) => {
+const getAssets = async (exportables, config) => {
+    const { format, connector, casing } = config;
     let assets = [];
     exportables.forEach(async (exportable) => {
         const node = figma.getNodeById(exportable.id);
@@ -61,22 +62,41 @@ const getAssets = async (exportables, format, connector, casing) => {
     });
     return assets;
 };
-figma.on("selectionchange", () => {
+const refreshUI = async (config) => {
     const exportables = getExportables();
-    figma.ui.postMessage({ type: "nodes", count: exportables.length });
+    let example = [];
+    if (config) {
+        const assets = await getAssets(exportables, config);
+        example = assets.map((a) => a.filename);
+    }
+    figma.ui.postMessage({
+        type: "refresh",
+        nodeCount: exportables.length,
+        example,
+    });
+};
+figma.on("selectionchange", () => {
+    refreshUI();
 });
 figma.ui.onmessage = async (message) => {
     const type = message.type;
     if (type === "init") {
-        const exportables = getExportables();
-        figma.ui.postMessage({ type: "nodes", count: exportables.length });
+        refreshUI();
     }
-    else if (type === "format") {
-        // TODO
+    else if (type === "config") {
+        refreshUI({
+            format: message.format,
+            connector: message.connector,
+            casing: message.casing,
+        });
     }
     else if (type === "export") {
         const exportables = getExportables();
-        const assets = await getAssets(exportables, message.format, message.connector, message.casing);
+        const assets = await getAssets(exportables, {
+            format: message.format,
+            connector: message.connector,
+            casing: message.casing,
+        });
         figma.ui.postMessage({ type: "export", assets });
     }
     else if (type === "cancel") {

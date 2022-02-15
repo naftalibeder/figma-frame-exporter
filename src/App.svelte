@@ -9,10 +9,12 @@
   } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
 
-  let nodeCount = 0;
   let format = "{f}{v}";
   let connector = ".";
   let casingOption = undefined;
+
+  let nodeCount = 0;
+  let example = ["Select at least one frame."];
 
   let casingOptions = [
     { value: "lower", label: "Lower", group: null, selected: true },
@@ -28,32 +30,19 @@
     const message = event.data.pluginMessage;
     const type = message.type;
 
-    if (type === "nodes") {
-      nodeCount = message.count;
+    if (type === "refresh") {
+      nodeCount = message.nodeCount;
+      example = message.example;
     } else if (type === "export") {
       exportZip(message.assets);
     }
   };
 
-  const onChangeFormat = () => {
+  const onChangeConfig = () => {
     parent.postMessage(
       {
         pluginMessage: {
-          type: "format",
-          format,
-          connector,
-          casing: casingOption.value,
-        },
-      },
-      "*"
-    );
-  };
-
-  const onChangeConnector = () => {
-    parent.postMessage(
-      {
-        pluginMessage: {
-          type: "format",
+          type: "config",
           format,
           connector,
           casing: casingOption.value,
@@ -98,7 +87,7 @@
   <Section>Filename</Section>
   <Input
     placeholder="Enter a format"
-    on:keydown={onChangeFormat}
+    on:keydown={onChangeConfig}
     bind:value={format}
   />
   <Label>{"{f} = frame name; {v} = variant value"}</Label>
@@ -106,13 +95,20 @@
   <Section>Connector</Section>
   <Input
     placeholder="Enter a character"
-    on:keydown={onChangeConnector}
+    on:keydown={onChangeConfig}
     bind:value={connector}
   />
   <Label>{"Each tag above will be joined by this character."}</Label>
 
   <Section>Capitalization</Section>
   <SelectMenu bind:menuItems={casingOptions} bind:value={casingOption} />
+
+  <Section>Example output</Section>
+  <div class="example">
+    {#each example as item}
+      <div>{item}</div>
+    {/each}
+  </div>
 
   <div class="button-holder">
     <Button on:click={onSelectExport} disabled={nodeCount === 0}
@@ -131,6 +127,15 @@
     font-size: small;
   }
   .button-holder {
+    margin-top: 8px;
+  }
+  .example {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
     padding: 8px;
+    border-radius: 4px;
+    font-size: smaller;
+    background-color: rgb(235, 235, 235);
   }
 </style>
