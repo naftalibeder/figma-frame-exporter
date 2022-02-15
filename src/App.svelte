@@ -1,39 +1,10 @@
 <script lang="ts">
-  import JSZip from "../node_modules/jszip/dist/jszip.min.js";
   import { onMount } from "svelte";
-  import Button from "./Button.svelte";
+  import { Button, Input, Section, Label } from "figma-plugin-ds-svelte";
+  import JSZip from "../node_modules/jszip/dist/jszip.min.js";
 
   let nodeCount = 0;
-
-  const onSelectExport = () => {
-    parent.postMessage({ pluginMessage: { type: "export" } }, "*");
-  };
-
-  const onSelectCancel = () => {
-    parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
-  };
-
-  const exportZip = (assets: Asset[]) => {
-    let zip = new JSZip();
-
-    console.log("assets:", assets);
-
-    assets.forEach((asset) => {
-      // const cleanBytes = typedArrayToBuffer(bytes);
-      let blob = new Blob([asset.data!], { type: "image/png" });
-      zip.file(`${asset.filename}.png`, blob, {
-        base64: true,
-      });
-    });
-
-    zip.generateAsync({ type: "blob" }).then((content: Blob) => {
-      const blobURL = window.URL.createObjectURL(content);
-      const link = document.createElement("a");
-      link.href = blobURL;
-      link.download = `Export.zip`;
-      link.click();
-    });
-  };
+  let format = "{f}.{v}";
 
   onMount(() => {
     parent.postMessage({ pluginMessage: { type: "init" } }, "*");
@@ -49,16 +20,71 @@
       exportZip(message.assets);
     }
   };
+
+  const onChangeFormat = () => {
+    parent.postMessage({ pluginMessage: { type: "format", format } }, "*");
+  };
+
+  const onSelectExport = () => {
+    parent.postMessage({ pluginMessage: { type: "export", format } }, "*");
+  };
+
+  const onSelectCancel = () => {
+    parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
+  };
+
+  const exportZip = async (assets: Asset[]) => {
+    let zip = new JSZip();
+
+    assets.forEach((asset) => {
+      let blob = new Blob([asset.data!], { type: "image/png" });
+      zip.file(`${asset.filename}.png`, blob, { base64: true });
+    });
+
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Export.zip";
+    link.click();
+  };
 </script>
 
-<div>
-  <div>{nodeCount} frames selected</div>
-  <input type="text" />
+<div class="wrap">
+  <Section>Format</Section>
+  <Input type="text" on:keydown={onChangeFormat} bind:value={format} />
+
   <div>
-    <Button onClick={onSelectCancel}>Cancel</Button>
-    <Button onClick={onSelectExport} disabled={nodeCount === 0}>Export</Button>
+    <Label
+      >{"{f} = frame name; {p} = variant property; {v} = variant value"}</Label
+    >
+    <Label>
+      {"To include a character only if the value exists, place it inside the braces, e.g. '{-v}'."}
+    </Label>
+  </div>
+
+  <div class="button-holder">
+    <Button variant="secondary" on:click={onSelectCancel}>Cancel</Button>
+    <Button on:click={onSelectExport} disabled={nodeCount === 0}
+      >Export {nodeCount} images</Button
+    >
   </div>
 </div>
 
 <style>
+  .wrap {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px;
+    font-size: small;
+  }
+  .button-holder {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    padding: 8px;
+    gap: 8px;
+  }
 </style>

@@ -7,6 +7,8 @@ import svg from "rollup-plugin-svg";
 import typescript from "@rollup/plugin-typescript";
 import sveltePreprocess from "svelte-preprocess";
 import htmlBundle from "rollup-plugin-html-bundle";
+import postcss from "rollup-plugin-postcss";
+import cssnano from "cssnano";
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -36,6 +38,10 @@ export default [
       }),
       commonjs(),
       svg(),
+      postcss({
+        extensions: [".css"],
+        plugins: [cssnano()],
+      }),
       htmlBundle({
         template: "src/index.html",
         target: "public/index.html",

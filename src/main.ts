@@ -1,4 +1,4 @@
-figma.showUI(__html__);
+figma.showUI(__html__, { width: 280, height: 240 });
 
 interface Exportable {
   id: string;
@@ -39,20 +39,23 @@ const getExportables = () => {
   return exportables;
 };
 
-const getAssets = async (exportables: readonly Exportable[]) => {
+const getAssets = async (
+  exportables: readonly Exportable[],
+  format: string
+) => {
   let assets: Asset[] = [];
 
   exportables.forEach(async (exportable) => {
     const node = figma.getNodeById(exportable.id) as SceneNode;
-    const settings: ExportSettings = {
-      suffix: `${exportable.parentName}.${exportable.variantValue}`,
-      format: "PNG",
-    };
-    const data = await (<ExportMixin>node).exportAsync(settings);
-    assets.push({
-      filename: `${exportable.parentName}.${exportable.variantValue}`,
-      data,
-    });
+    let filename = format.replace("{f}", exportable.parentName);
+    if (exportable.variantProperty) {
+    }
+    if (exportable.variantValue) {
+      filename = filename.replace(/\{.*v\}/, exportable.variantValue);
+    }
+    console.log(filename);
+    const data = await (<ExportMixin>node).exportAsync({ format: "PNG" });
+    assets.push({ filename, data });
   });
 
   return assets;
@@ -69,9 +72,11 @@ figma.ui.onmessage = async (message) => {
   if (type === "init") {
     const exportables = getExportables();
     figma.ui.postMessage({ type: "nodes", count: exportables.length });
+  } else if (type === "format") {
+    // TODO
   } else if (type === "export") {
     const exportables = getExportables();
-    const assets = await getAssets(exportables);
+    const assets = await getAssets(exportables, message.format);
     figma.ui.postMessage({ type: "export", assets });
   } else if (type === "cancel") {
     figma.closePlugin();
