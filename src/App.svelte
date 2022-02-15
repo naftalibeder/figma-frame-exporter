@@ -1,10 +1,24 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Button, Input, Section, Label } from "figma-plugin-ds-svelte";
+  import {
+    Button,
+    Input,
+    Section,
+    Label,
+    SelectMenu,
+  } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
 
   let nodeCount = 0;
-  let format = "{f}{.v}";
+  let format = "{f}{v}";
+  let connector = ".";
+  let casingOption = undefined;
+
+  let casingOptions = [
+    { value: "lower", label: "Lower", group: null, selected: true },
+    { value: "upper", label: "Upper", group: null, selected: false },
+    { value: "title", label: "Title", group: null, selected: false },
+  ];
 
   onMount(() => {
     parent.postMessage({ pluginMessage: { type: "init" } }, "*");
@@ -22,15 +36,45 @@
   };
 
   const onChangeFormat = () => {
-    parent.postMessage({ pluginMessage: { type: "format", format } }, "*");
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "format",
+          format,
+          connector,
+          casing: casingOption.value,
+        },
+      },
+      "*"
+    );
+  };
+
+  const onChangeConnector = () => {
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "format",
+          format,
+          connector,
+          casing: casingOption.value,
+        },
+      },
+      "*"
+    );
   };
 
   const onSelectExport = () => {
-    parent.postMessage({ pluginMessage: { type: "export", format } }, "*");
-  };
-
-  const onSelectCancel = () => {
-    parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "export",
+          format,
+          connector,
+          casing: casingOption.value,
+        },
+      },
+      "*"
+    );
   };
 
   const exportZip = async (assets: Asset[]) => {
@@ -51,20 +95,24 @@
 </script>
 
 <div class="wrap">
+  <Section>Filename</Section>
   <Input
     placeholder="Enter a format"
     on:keydown={onChangeFormat}
     bind:value={format}
   />
+  <Label>{"{f} = frame name; {v} = variant value"}</Label>
 
-  <div>
-    <Label
-      >{"{f} = frame name; {p} = variant property; {v} = variant value"}</Label
-    >
-    <Label>
-      {"To include a character only if the value exists, place it inside the braces, e.g. '{-v}'."}
-    </Label>
-  </div>
+  <Section>Connector</Section>
+  <Input
+    placeholder="Enter a character"
+    on:keydown={onChangeConnector}
+    bind:value={connector}
+  />
+  <Label>{"Each tag above will be joined by this character."}</Label>
+
+  <Section>Capitalization</Section>
+  <SelectMenu bind:menuItems={casingOptions} bind:value={casingOption} />
 
   <div class="button-holder">
     <Button on:click={onSelectExport} disabled={nodeCount === 0}
@@ -79,8 +127,7 @@
     flex: 1;
     flex-direction: column;
     gap: 8px;
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding: 8px;
     font-size: small;
   }
   .button-holder {
