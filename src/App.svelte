@@ -128,16 +128,16 @@
   <Section>Output</Section>
   <div class="example">
     {#if exampleAssets.length > 0}
-      {#each exampleAssets as exampleItem, index}
+      {#each exampleAssets as exampleAsset, index}
         {#if index > 0}
           <hr />
         {/if}
         <div class="example-row">
           <div>
-            {exampleItem.filename}.{extension}
+            {exampleAsset.filename}.{extension}
           </div>
           <div>
-            {exampleItem.size.width}x{exampleItem.size.height}
+            {exampleAsset.size.width}x{exampleAsset.size.height}
           </div>
         </div>
       {/each}
