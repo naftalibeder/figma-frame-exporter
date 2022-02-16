@@ -64,7 +64,10 @@ const getAssets = async (
       .replace("{f}", cased(exportable.parentName, casing))
       .replace("{v}", variantsStr);
 
-    const data = await (<ExportMixin>node).exportAsync({ format: "PNG" });
+    const data = await (<ExportMixin>node).exportAsync({
+      format: "PNG",
+      constraint: { type: "SCALE", value: 4 },
+    });
     assets.push({ filename, data });
   });
 
