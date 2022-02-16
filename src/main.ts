@@ -14,7 +14,6 @@ const getExportables = (): Exportable[] => {
       const children = node.children;
 
       for (const child of children) {
-        console.log(child.height, child.width);
         const pairs = child.name.split(", ");
 
         let variants: Variant[] = [];
@@ -113,7 +112,6 @@ figma.ui.onmessage = async (message) => {
     storedConfig = message.config;
     refreshUI();
   } else if (type === "config") {
-    console.log(message.config);
     storedConfig = message.config;
     refreshUI();
   } else if (type === "export") {
