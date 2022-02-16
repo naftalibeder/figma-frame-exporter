@@ -159,11 +159,13 @@
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
-    height: 160px;
+    height: 100px;
     padding: 8px;
-    border-radius: 4px;
     font-size: smaller;
-    background-color: rgb(235, 235, 235);
+    border-color: rgb(235, 235, 235);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
   }
   .example-text-placeholder {
     color: rgb(138, 138, 138);
@@ -175,6 +177,7 @@
     border-color: rgb(235, 235, 235);
     border-width: 1px;
     border-style: solid;
+    border-radius: 4px;
   }
   input:hover {
     border-color: rgb(219, 219, 219);

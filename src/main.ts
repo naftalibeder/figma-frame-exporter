@@ -1,7 +1,7 @@
 import { Exportable, Variant, Config, Asset } from "./types";
 import { cased } from "./utils";
 
-figma.showUI(__html__, { width: 300, height: 600 });
+figma.showUI(__html__, { width: 300, height: 526 });
 
 let storedConfig: Config | undefined;
 
