@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { Button, Section, Label, SelectMenu } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
-  import type { Asset, Casing, Config } from "./types";
+  import type { Asset, AssetInfo, Casing, Config } from "./types";
 
   interface CasingOption {
     value: Casing;
@@ -18,7 +18,7 @@
   let casingOption = undefined;
 
   let nodeCount = 0;
-  let exampleItems = [];
+  let exampleAssets: AssetInfo[] = [];
 
   let casingOptions: CasingOption[] = [
     { value: "lower", label: "Lower", group: null, selected: true },
@@ -40,7 +40,7 @@
 
     if (type === "refresh") {
       nodeCount = message.nodeCount;
-      exampleItems = message.exampleItems;
+      exampleAssets = message.exampleAssets;
     } else if (type === "export") {
       exportZip(message.assets);
     }
@@ -127,9 +127,19 @@
 
   <Section>Output</Section>
   <div class="example">
-    {#if exampleItems.length > 0}
-      {#each exampleItems as exampleItem}
-        <div>{`${exampleItem}.${extension}`}</div>
+    {#if exampleAssets.length > 0}
+      {#each exampleAssets as exampleItem, index}
+        {#if index > 0}
+          <hr />
+        {/if}
+        <div class="example-row">
+          <div>
+            {exampleItem.filename}.{extension}
+          </div>
+          <div>
+            {exampleItem.size.width}x{exampleItem.size.height}
+          </div>
+        </div>
       {/each}
     {:else}
       <div class="example-text-placeholder">Select at least one frame.</div>
@@ -159,13 +169,18 @@
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
-    height: 100px;
+    height: 116px;
     padding: 8px;
     font-size: smaller;
     border-color: rgb(235, 235, 235);
     border-width: 1px;
     border-style: solid;
     border-radius: 4px;
+  }
+  .example-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
   .example-text-placeholder {
     color: rgb(138, 138, 138);
@@ -185,5 +200,10 @@
   ::-webkit-scrollbar {
     width: 0px;
     background: transparent;
+  }
+  hr {
+    width: 100%;
+    border-top: rgb(235, 235, 235);
+    border-width: 1px;
   }
 </style>

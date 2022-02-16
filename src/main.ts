@@ -1,7 +1,7 @@
-import { Exportable, Variant, Config, Asset } from "./types";
+import { Exportable, Variant, Config, Asset, AssetInfo } from "./types";
 import { cased } from "./utils";
 
-figma.showUI(__html__, { width: 300, height: 526 });
+figma.showUI(__html__, { width: 300, height: 542 });
 
 let storedConfig: Config | undefined;
 
@@ -14,6 +14,7 @@ const getExportables = (): Exportable[] => {
       const children = node.children;
 
       for (const child of children) {
+        console.log(child.height, child.width);
         const pairs = child.name.split(", ");
 
         let variants: Variant[] = [];
@@ -29,6 +30,7 @@ const getExportables = (): Exportable[] => {
           id: child.id,
           parentName: node.name,
           variants,
+          size: { width: child.width, height: child.height },
         });
       }
     } else {
@@ -36,6 +38,7 @@ const getExportables = (): Exportable[] => {
         id: node.id,
         parentName: node.name,
         variants: [],
+        size: { width: node.width, height: node.height },
       });
     }
   }
@@ -64,11 +67,19 @@ const getAssets = async (
       .replace("{f}", cased(exportable.parentName, casing))
       .replace("{v}", variantsStr);
 
+    const scale = 4;
     const data = await (<ExportMixin>node).exportAsync({
       format: "PNG",
-      constraint: { type: "SCALE", value: 4 },
+      constraint: { type: "SCALE", value: scale },
     });
-    assets.push({ filename, data });
+    assets.push({
+      filename,
+      data,
+      size: {
+        width: exportable.size.width * scale,
+        height: exportable.size.height * scale,
+      },
+    });
   });
 
   return assets;
@@ -77,16 +88,21 @@ const getAssets = async (
 const refreshUI = async () => {
   const exportables = getExportables();
 
-  let exampleItems: string[] = [];
+  let exampleAssets: AssetInfo[] = [];
   if (storedConfig) {
     const assets = await getAssets(exportables, storedConfig);
-    exampleItems = assets.map((a) => a.filename);
+    exampleAssets = assets.map((a) => {
+      return {
+        filename: a.filename,
+        size: a.size,
+      };
+    });
   }
 
   figma.ui.postMessage({
     type: "refresh",
     nodeCount: exportables.length,
-    exampleItems,
+    exampleAssets,
   });
 };
 
