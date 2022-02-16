@@ -7,3 +7,4 @@ Export icons with variants from Figma.
 - Additional text formatting options, e.g. camelcase.
 - Customize exported image scale.
 - Handle naming when only some variants inside a component are selected.
+- Customize file format (`jpg`, `svg`, etc.).
