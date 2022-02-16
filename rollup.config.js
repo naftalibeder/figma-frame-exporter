@@ -21,7 +21,7 @@ export default [
     output: {
       format: "iife",
       name: "ui",
-      file: "public/build/bundle.js",
+      file: "build/bundle.js",
     },
     plugins: [
       svelte({
@@ -47,7 +47,7 @@ export default [
       }),
       htmlBundle({
         template: "src/index.html",
-        target: "public/build/index.html",
+        target: "build/index.html",
         inline: true,
       }),
       alias({
@@ -57,7 +57,7 @@ export default [
         },
       }),
       !production && serve(),
-      !production && livereload("public"),
+      !production && livereload("build"),
       production && terser(),
     ],
     watch: {
@@ -67,7 +67,7 @@ export default [
   {
     input: "src/main.ts",
     output: {
-      file: "public/build/main.js",
+      file: "build/main.js",
       format: "cjs",
       name: "main",
     },

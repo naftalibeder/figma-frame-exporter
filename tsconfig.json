@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "public/build",
+    "outDir": "build",
     "target": "ES2019",
     "lib": ["ES2019", "dom"],
     "typeRoots": [
