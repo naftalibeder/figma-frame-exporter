@@ -1,3 +1,4 @@
+import path from "path";
 import svelte from "rollup-plugin-svelte";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
@@ -7,10 +8,12 @@ import svg from "rollup-plugin-svg";
 import typescript from "@rollup/plugin-typescript";
 import sveltePreprocess from "svelte-preprocess";
 import htmlBundle from "rollup-plugin-html-bundle";
+import alias from "@rollup/plugin-alias";
 import postcss from "rollup-plugin-postcss";
 import cssnano from "cssnano";
 
 const production = !process.env.ROLLUP_WATCH;
+const projectDir = path.resolve(__dirname);
 
 export default [
   {
@@ -44,8 +47,14 @@ export default [
       }),
       htmlBundle({
         template: "src/index.html",
-        target: "public/index.html",
+        target: "public/build/index.html",
         inline: true,
+      }),
+      alias({
+        // Duplicate in `.tsconfig`.
+        entries: {
+          "@utils": path.resolve(projectDir, "src/utils"),
+        },
       }),
       !production && serve(),
       !production && livereload("public"),
@@ -58,7 +67,7 @@ export default [
   {
     input: "src/main.ts",
     output: {
-      file: "public/main.js",
+      file: "public/build/main.js",
       format: "cjs",
       name: "main",
     },

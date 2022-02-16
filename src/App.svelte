@@ -8,23 +8,37 @@
     SelectMenu,
   } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
+  import type { Asset, Casing, Config } from "./types";
+
+  interface CasingOption {
+    value: Casing;
+    label: string;
+    group: string | null;
+    selected: boolean;
+  }
+
+  const extension = "png";
 
   let format = "{f}{v}";
   let connector = ".";
   let casingOption = undefined;
 
   let nodeCount = 0;
-  let example = ["Select at least one frame."];
+  let exampleItems = [];
 
-  let casingOptions = [
+  let casingOptions: CasingOption[] = [
     { value: "lower", label: "Lower", group: null, selected: true },
     { value: "upper", label: "Upper", group: null, selected: false },
     { value: "title", label: "Title", group: null, selected: false },
   ];
 
-  onMount(() => {
-    parent.postMessage({ pluginMessage: { type: "init" } }, "*");
-  });
+  const buildConfig = (): Config => {
+    return {
+      format,
+      connector,
+      casing: casingOption.value,
+    };
+  };
 
   window.onmessage = (event: MessageEvent) => {
     const message = event.data.pluginMessage;
@@ -32,20 +46,30 @@
 
     if (type === "refresh") {
       nodeCount = message.nodeCount;
-      example = message.example;
+      exampleItems = message.exampleItems;
     } else if (type === "export") {
       exportZip(message.assets);
     }
   };
 
-  const onChangeConfig = () => {
+  onMount(() => {
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "init",
+          config: buildConfig(),
+        },
+      },
+      "*"
+    );
+  });
+
+  const onChangeConfig = (e) => {
     parent.postMessage(
       {
         pluginMessage: {
           type: "config",
-          format,
-          connector,
-          casing: casingOption.value,
+          config: buildConfig(),
         },
       },
       "*"
@@ -57,9 +81,7 @@
       {
         pluginMessage: {
           type: "export",
-          format,
-          connector,
-          casing: casingOption.value,
+          config: buildConfig(),
         },
       },
       "*"
@@ -70,8 +92,8 @@
     let zip = new JSZip();
 
     assets.forEach((asset) => {
-      let blob = new Blob([asset.data!], { type: "image/png" });
-      zip.file(`${asset.filename}.png`, blob, { base64: true });
+      let blob = new Blob([asset.data!], { type: `image/${extension}` });
+      zip.file(`${asset.filename}.${extension}`, blob, { base64: true });
     });
 
     const blob = await zip.generateAsync({ type: "blob" });
@@ -85,29 +107,39 @@
 
 <div class="wrap">
   <Section>Filename</Section>
-  <Input
+  <input
+    type="text"
     placeholder="Enter a format"
-    on:keydown={onChangeConfig}
     bind:value={format}
+    on:change={onChangeConfig}
   />
   <Label>{"{f} = frame name; {v} = variant value"}</Label>
 
   <Section>Connector</Section>
-  <Input
-    placeholder="Enter a character"
-    on:keydown={onChangeConfig}
+  <input
+    type="text"
+    placeholder="Enter a connector mark"
     bind:value={connector}
+    on:input={onChangeConfig}
   />
-  <Label>{"Each tag above will be joined by this character."}</Label>
+  <Label>{"Each tag above will be joined by this mark."}</Label>
 
   <Section>Capitalization</Section>
-  <SelectMenu bind:menuItems={casingOptions} bind:value={casingOption} />
+  <SelectMenu
+    bind:menuItems={casingOptions}
+    bind:value={casingOption}
+    on:change={onChangeConfig}
+  />
 
-  <Section>Example output</Section>
+  <Section>Output</Section>
   <div class="example">
-    {#each example as item}
-      <div>{item}</div>
-    {/each}
+    {#if exampleItems.length > 0}
+      {#each exampleItems as exampleItem}
+        <div>{`${exampleItem}.${extension}`}</div>
+      {/each}
+    {:else}
+      <div class="example-text-placeholder">Select at least one frame.</div>
+    {/if}
   </div>
 
   <div class="button-holder">
@@ -131,11 +163,30 @@
   }
   .example {
     display: flex;
-    flex: 1;
     flex-direction: column;
+    overflow-y: scroll;
+    height: 160px;
     padding: 8px;
     border-radius: 4px;
     font-size: smaller;
     background-color: rgb(235, 235, 235);
+  }
+  .example-text-placeholder {
+    color: rgb(138, 138, 138);
+  }
+  input {
+    font-size: smaller;
+    height: 32px;
+    padding: 8px;
+    border-color: rgb(235, 235, 235);
+    border-width: 1px;
+    border-style: solid;
+  }
+  input:hover {
+    border-color: rgb(219, 219, 219);
+  }
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
   }
 </style>

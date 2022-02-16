@@ -1,30 +1,11 @@
-figma.showUI(__html__, { width: 300, height: 500 });
+import { Exportable, Variant, Config, Asset } from "./types";
+import { cased } from "./utils";
 
-type Casing = "lower" | "upper" | "title";
+figma.showUI(__html__, { width: 300, height: 600 });
 
-interface Config {
-  format: string;
-  connector: string;
-  casing: Casing;
-}
+let storedConfig: Config | undefined;
 
-interface Variant {
-  property: string;
-  value: string;
-}
-
-interface Exportable {
-  id: string;
-  parentName: string;
-  variants: Variant[];
-}
-
-interface Asset {
-  filename: string;
-  data: Uint8Array;
-}
-
-const getExportables = () => {
+const getExportables = (): Exportable[] => {
   const nodes = figma.currentPage.selection;
   const exportables: Exportable[] = [];
 
@@ -62,20 +43,10 @@ const getExportables = () => {
   return exportables;
 };
 
-const cased = (value: string, casing: Casing) => {
-  if (casing === "lower") {
-    return value.toLowerCase();
-  } else if (casing === "upper") {
-    return value.toUpperCase();
-  } else if (casing === "title") {
-    return value.slice(0, 1).toUpperCase() + value.slice(1).toLowerCase();
-  }
-};
-
 const getAssets = async (
   exportables: readonly Exportable[],
   config: Config
-) => {
+): Promise<Asset[]> => {
   const { format, connector, casing } = config;
 
   let assets: Asset[] = [];
@@ -93,8 +64,6 @@ const getAssets = async (
       .replace("{f}", cased(exportable.parentName, casing))
       .replace("{v}", variantsStr);
 
-    console.log(filename);
-
     const data = await (<ExportMixin>node).exportAsync({ format: "PNG" });
     assets.push({ filename, data });
   });
@@ -102,46 +71,41 @@ const getAssets = async (
   return assets;
 };
 
-const refreshUI = async (config?: Config) => {
+const refreshUI = async () => {
   const exportables = getExportables();
 
-  let example: string[] = [];
-  if (config) {
-    const assets = await getAssets(exportables, config);
-    example = assets.map((a) => a.filename);
+  let exampleItems: string[] = [];
+  if (storedConfig) {
+    const assets = await getAssets(exportables, storedConfig);
+    exampleItems = assets.map((a) => a.filename);
   }
 
   figma.ui.postMessage({
     type: "refresh",
     nodeCount: exportables.length,
-    example,
+    exampleItems,
   });
 };
-
-figma.on("selectionchange", () => {
-  refreshUI();
-});
 
 figma.ui.onmessage = async (message) => {
   const type = message.type;
 
   if (type === "init") {
+    storedConfig = message.config;
     refreshUI();
   } else if (type === "config") {
-    refreshUI({
-      format: message.format,
-      connector: message.connector,
-      casing: message.casing,
-    });
+    console.log(message.config);
+    storedConfig = message.config;
+    refreshUI();
   } else if (type === "export") {
     const exportables = getExportables();
-    const assets = await getAssets(exportables, {
-      format: message.format,
-      connector: message.connector,
-      casing: message.casing,
-    });
+    const assets = await getAssets(exportables, message.config);
     figma.ui.postMessage({ type: "export", assets });
   } else if (type === "cancel") {
     figma.closePlugin();
   }
 };
+
+figma.on("selectionchange", () => {
+  refreshUI();
+});
