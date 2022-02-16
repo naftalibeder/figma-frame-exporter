@@ -1,12 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import {
-    Button,
-    Input,
-    Section,
-    Label,
-    SelectMenu,
-  } from "figma-plugin-ds-svelte";
+  import { Button, Section, Label, SelectMenu } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
   import type { Asset, Casing, Config } from "./types";
 
