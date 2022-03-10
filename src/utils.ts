@@ -9,3 +9,7 @@ export const cased = (value: string, casing: Casing): string => {
     return value.slice(0, 1).toUpperCase() + value.slice(1).toLowerCase();
   }
 };
+
+export const log = (...args: any[]) => {
+  console.log(...args);
+}

@@ -1,5 +1,5 @@
 import { Exportable, Variant, Config, Asset, AssetInfo } from "./types";
-import { cased } from "./utils";
+import { cased, log } from "./utils";
 
 figma.showUI(__html__, { width: 300, height: 542 });
 
@@ -53,24 +53,32 @@ const getAssets = async (
 
   let assets: Asset[] = [];
 
-  exportables.forEach(async (exportable) => {
+  for (const exportable of exportables) {
     const node = figma.getNodeById(exportable.id) as SceneNode;
 
     let variantsStr = "";
-    exportable.variants.forEach((variant) => {
+    for (const variant of exportable.variants) {
       const value = cased(variant.value, casing);
       variantsStr += `${connector}${value}`;
-    });
+    }
 
     let filename = format
       .replace("{f}", cased(exportable.parentName, casing))
       .replace("{v}", variantsStr);
 
     const scale = 4;
-    const data = await (<ExportMixin>node).exportAsync({
-      format: "PNG",
-      constraint: { type: "SCALE", value: scale },
-    });
+
+    let data: Uint8Array;
+    try {
+      data = await (<ExportMixin>node).exportAsync({
+        format: "PNG",
+        constraint: { type: "SCALE", value: scale },
+      });
+    } catch (e) {
+      log(e);
+      continue;
+    }
+
     assets.push({
       filename,
       data,
@@ -79,7 +87,7 @@ const getAssets = async (
         height: exportable.size.height * scale,
       },
     });
-  });
+  }
 
   return assets;
 };
