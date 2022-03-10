@@ -5,6 +5,7 @@ Export icons with variants from Figma.
 ## To do
 
 - [ ] Specify whitespace replacement in frame names, e.g. `coffee cup.dark.png` to `coffee-cup.dark.png`.
+- [ ] More expansive renaming of frames, e.g. `assets / icons / checkmark.png` to `checkmark.png`.
 - [ ] Customize exported image scale.
 - [ ] Additional text formatting options, e.g. camelcase.
 - [ ] Customize file format (`jpg`, `svg`).
