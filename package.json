@@ -1,14 +1,14 @@
 {
   "name": "export",
-  "version": "1.0.0",
+  "version": "2022.2",
   "description": "Export images and variants with configurable filenames",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv build"
   },
-  "author": "",
-  "license": "",
+  "author": "Naftali Beder",
+  "license": "MIT",
   "devDependencies": {
     "@figma/plugin-typings": "1.42.1",
     "@rollup/plugin-commonjs": "21.0.1",
