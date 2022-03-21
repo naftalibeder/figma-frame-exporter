@@ -1,9 +1,13 @@
 export type Casing = "lower" | "upper" | "title";
 
+export type Extension = "PNG" | "JPG" | "SVG";
+
 export interface Config {
-  format: string;
+  syntax: string;
   connector: string;
   casing: Casing;
+  sizeConstraint: string;
+  extension: Extension;
 }
 
 export interface Size {
@@ -25,12 +29,14 @@ export interface Exportable {
 
 export interface Asset {
   filename: string;
+  extension: Extension;
   data: Uint8Array;
   size: Size;
 }
 
 export interface AssetInfo {
   filename: string;
+  extension: Extension;
   size: Size;
 }
 

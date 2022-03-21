@@ -1,7 +1,7 @@
 import { Exportable, Variant, Config, Asset, AssetInfo } from "./types";
-import { cased, log } from "./utils";
+import { cased, log, sizeContraint } from "./utils";
 
-figma.showUI(__html__, { width: 300, height: 542 });
+figma.showUI(__html__, { width: 340, height: 542 });
 
 let storedConfig: Config | undefined;
 
@@ -49,7 +49,7 @@ const getAssets = async (
   exportables: readonly Exportable[],
   config: Config
 ): Promise<Asset[]> => {
-  const { format, connector, casing } = config;
+  const { syntax, connector, casing, extension } = config;
 
   let assets: Asset[] = [];
 
@@ -62,17 +62,20 @@ const getAssets = async (
       variantsStr += `${connector}${value}`;
     }
 
-    let filename = format
+    let filename = syntax
       .replace("{f}", cased(exportable.parentName, casing))
       .replace("{v}", variantsStr);
 
-    const scale = 4;
+    const { constraint, destSize } = sizeContraint(
+      config.sizeConstraint,
+      exportable.size
+    );
 
     let data: Uint8Array;
     try {
       data = await (<ExportMixin>node).exportAsync({
-        format: "PNG",
-        constraint: { type: "SCALE", value: scale },
+        format: extension,
+        constraint,
       });
     } catch (e) {
       log(e);
@@ -81,10 +84,11 @@ const getAssets = async (
 
     assets.push({
       filename,
+      extension,
       data,
       size: {
-        width: exportable.size.width * scale,
-        height: exportable.size.height * scale,
+        width: destSize.width,
+        height: destSize.height,
       },
     });
   }
@@ -101,6 +105,7 @@ const refreshUI = async () => {
     exampleAssets = assets.map((a) => {
       return {
         filename: a.filename,
+        extension: a.extension,
         size: a.size,
       };
     });

@@ -2,7 +2,8 @@
   import { onMount } from "svelte";
   import { Button, Section, Label, SelectMenu } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
-  import type { Asset, AssetInfo, Casing, Config } from "./types";
+  import type { Asset, AssetInfo, Casing, Config, Extension } from "./types";
+  import { ExternalOption } from "rollup";
 
   interface CasingOption {
     value: Casing;
@@ -11,11 +12,18 @@
     selected: boolean;
   }
 
-  const extension = "png";
+  interface ExtensionOption {
+    value: Extension;
+    label: string;
+    group: string | null;
+    selected: boolean;
+  }
 
-  let format = "{f}{v}";
+  let syntax = "{f}{v}";
   let connector = ".";
   let casingOption = undefined;
+  let sizeConstraint = "3x";
+  let extensionOption = undefined;
 
   let nodeCount = 0;
   let exampleAssets: AssetInfo[] = [];
@@ -26,11 +34,19 @@
     { value: "title", label: "Title", group: null, selected: false },
   ];
 
+  let extensionOptions: ExtensionOption[] = [
+    { value: "PNG", label: "PNG", group: null, selected: true },
+    { value: "JPG", label: "JPG", group: null, selected: false },
+    { value: "SVG", label: "SVG", group: null, selected: false },
+  ];
+
   const buildConfig = (): Config => {
     return {
-      format,
+      syntax,
       connector,
       casing: casingOption.value,
+      sizeConstraint,
+      extension: extensionOption.value,
     };
   };
 
@@ -86,8 +102,9 @@
     let zip = new JSZip();
 
     assets.forEach((asset) => {
-      let blob = new Blob([asset.data!], { type: `image/${extension}` });
-      zip.file(`${asset.filename}.${extension}`, blob, { base64: true });
+      const extensionLower = asset.extension.toLowerCase();
+      let blob = new Blob([asset.data!], { type: `image/${extensionLower}` });
+      zip.file(`${asset.filename}.${extensionLower}`, blob, { base64: true });
     });
 
     const blob = await zip.generateAsync({ type: "blob" });
@@ -103,27 +120,51 @@
   <Section>Filename</Section>
   <input
     type="text"
-    placeholder="Enter a format"
-    bind:value={format}
+    placeholder="Enter a syntax"
+    bind:value={syntax}
     on:change={onChangeConfig}
   />
   <Label>{"{f} = frame name; {v} = variant value"}</Label>
 
-  <Section>Connector</Section>
-  <input
-    type="text"
-    placeholder="Enter a connector mark"
-    bind:value={connector}
-    on:input={onChangeConfig}
-  />
-  <Label>{"Each tag above will be joined by this mark."}</Label>
+  <div class="row">
+    <div class="section">
+      <Section>Connector</Section>
+      <input
+        type="text"
+        placeholder="Enter a connector mark"
+        bind:value={connector}
+        on:input={onChangeConfig}
+      />
+    </div>
+    <div class="section">
+      <Section>Capitalization</Section>
+      <SelectMenu
+        bind:menuItems={casingOptions}
+        bind:value={casingOption}
+        on:change={onChangeConfig}
+      />
+    </div>
+  </div>
 
-  <Section>Capitalization</Section>
-  <SelectMenu
-    bind:menuItems={casingOptions}
-    bind:value={casingOption}
-    on:change={onChangeConfig}
-  />
+  <div class="row">
+    <div class="section">
+      <Section>Size</Section>
+      <input
+        type="text"
+        placeholder="E.g. 3x, 64w, 200h"
+        bind:value={sizeConstraint}
+        on:input={onChangeConfig}
+      />
+    </div>
+    <div class="section">
+      <Section>Format</Section>
+      <SelectMenu
+        bind:menuItems={extensionOptions}
+        bind:value={extensionOption}
+        on:change={onChangeConfig}
+      />
+    </div>
+  </div>
 
   <Section>Output</Section>
   <div class="example">
@@ -134,7 +175,7 @@
         {/if}
         <div class="example-row">
           <div>
-            {exampleAsset.filename}.{extension}
+            {exampleAsset.filename}.{exampleAsset.extension.toLowerCase()}
           </div>
           <div>
             {exampleAsset.size.width}x{exampleAsset.size.height}
@@ -162,6 +203,17 @@
     padding: 8px;
     font-size: small;
   }
+  .row {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    gap: 8px;
+  }
+  .section {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
   .button-holder {
     margin-top: 8px;
   }
@@ -169,7 +221,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
-    height: 116px;
+    height: 142px;
     padding: 8px;
     font-size: smaller;
     border-color: rgb(235, 235, 235);
@@ -188,7 +240,7 @@
   input {
     font-size: smaller;
     height: 32px;
-    padding: 8px;
+    padding-left: 8px;
     border-color: rgb(235, 235, 235);
     border-width: 1px;
     border-style: solid;
