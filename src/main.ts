@@ -57,14 +57,18 @@ const getAssets = async (
     const node = figma.getNodeById(exportable.id) as SceneNode;
 
     let variantsStr = "";
-    for (const variant of exportable.variants) {
+    exportable.variants.forEach((variant, i) => {
       const value = cased(variant.value, casing);
-      variantsStr += `${connector}${value}`;
-    }
+      if (i > 0) {
+        variantsStr += `${connector}${value}`;
+      } else {
+        variantsStr += value;
+      }
+    })
 
     let filename = syntax
-      .replace("{f}", cased(exportable.parentName, casing))
-      .replace("{v}", variantsStr);
+      .replace("{frame}", cased(exportable.parentName, casing))
+      .replace("{variant}", variantsStr);
 
     const { constraint, destSize } = sizeContraint(
       config.sizeConstraint,
