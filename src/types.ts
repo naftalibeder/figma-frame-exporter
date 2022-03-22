@@ -1,6 +1,6 @@
 export type Casing = "lower" | "upper" | "title";
-
 export type Extension = "PNG" | "JPG" | "SVG";
+export type ConstraintType = "SCALE" | "WIDTH" | "HEIGHT";
 
 export interface Config {
   syntax: string;
