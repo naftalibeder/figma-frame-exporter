@@ -1,9 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Button, Section, Label, SelectMenu } from "figma-plugin-ds-svelte";
+  import { Button, Section, SelectMenu } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
   import type { Asset, AssetInfo, Casing, Config, Extension } from "./types";
-  import { ExternalOption } from "rollup";
 
   interface CasingOption {
     value: Casing;
@@ -19,15 +18,6 @@
     selected: boolean;
   }
 
-  let syntax = "{f}{v}";
-  let connector = ".";
-  let casingOption = undefined;
-  let sizeConstraint = "3x";
-  let extensionOption = undefined;
-
-  let nodeCount = 0;
-  let exampleAssets: AssetInfo[] = [];
-
   let casingOptions: CasingOption[] = [
     { value: "lower", label: "Lower", group: null, selected: true },
     { value: "upper", label: "Upper", group: null, selected: false },
@@ -39,6 +29,15 @@
     { value: "JPG", label: "JPG", group: null, selected: false },
     { value: "SVG", label: "SVG", group: null, selected: false },
   ];
+
+  let syntax = "{frame}.{variant}";
+  let connector = ".";
+  let casingOption = casingOptions[0];
+  let sizeConstraint = "2x";
+  let extensionOption = extensionOptions[0];
+
+  let nodeCount = 0;
+  let exampleAssets: AssetInfo[] = [];
 
   const buildConfig = (): Config => {
     return {
@@ -117,18 +116,21 @@
 </script>
 
 <div class="wrap">
-  <Section>Filename</Section>
-  <input
-    type="text"
-    placeholder="Enter a syntax"
-    bind:value={syntax}
-    on:change={onChangeConfig}
-  />
-  <Label>{"{f} = frame name; {v} = variant value"}</Label>
+  <div class="row">
+    <div class="section">
+      <Section>Filename</Section>
+      <input
+        type="text"
+        placeholder="Enter a syntax"
+        bind:value={syntax}
+        on:input={onChangeConfig}
+      />
+    </div>
+  </div>
 
   <div class="row">
     <div class="section">
-      <Section>Connector</Section>
+      <Section>Variant connector</Section>
       <input
         type="text"
         placeholder="Enter a connector mark"
@@ -151,7 +153,7 @@
       <Section>Size</Section>
       <input
         type="text"
-        placeholder="E.g. 3x, 64w, 200h"
+        placeholder="E.g. 2x, 64w, 200h"
         bind:value={sizeConstraint}
         on:input={onChangeConfig}
       />
@@ -174,12 +176,14 @@
           <hr />
         {/if}
         <div class="example-row">
-          <div>
+          <span class="example-row-filename">
             {exampleAsset.filename}.{exampleAsset.extension.toLowerCase()}
-          </div>
-          <div>
-            {exampleAsset.size.width}x{exampleAsset.size.height}
-          </div>
+          </span>
+          <span>
+            {Math.round(exampleAsset.size.width)}x{Math.round(
+              exampleAsset.size.height
+            )}
+          </span>
         </div>
       {/each}
     {:else}
@@ -233,6 +237,15 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    gap: 8px;
+  }
+  .example-row-filename {
+    display: flex;
+    white-space: nowrap;
+    overflow-x: scroll;
+  }
+  .example-row-filename::-webkit-scrollbar {
+    display: none;
   }
   .example-text-placeholder {
     color: rgb(138, 138, 138);
