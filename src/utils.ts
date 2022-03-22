@@ -1,4 +1,4 @@
-import { Casing, Size } from "./types";
+import { Casing, Size, ConstraintType } from "./types";
 
 export const cased = (value: string, casing: Casing): string => {
   if (casing === "lower") {
@@ -26,6 +26,24 @@ export const sizeContraint = (
       destSize: {
         width: srcSize.width * value,
         height: srcSize.height * value,
+      },
+    };
+  } else if (constraint.endsWith("w")) {
+    const value = Number(constraint.slice(0, -1));
+    return {
+      constraint: { type: 'WIDTH', value },
+      destSize: {
+        width: value,
+        height: srcSize.height * (value / srcSize.width),
+      },
+    };
+  } else if (constraint.endsWith("h")) {
+    const value = Number(constraint.slice(0, -1));
+    return {
+      constraint: { type: 'HEIGHT', value },
+      destSize: {
+        width: srcSize.width * (value / srcSize.height),
+        height: value,
       },
     };
   } else {
