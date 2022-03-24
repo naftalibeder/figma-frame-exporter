@@ -241,7 +241,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
-    height: 142px;
+    height: 166px;
     padding: 8px;
     font-size: smaller;
     border-color: rgb(235, 235, 235);
