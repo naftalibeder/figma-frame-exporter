@@ -1,4 +1,4 @@
-import { Casing, Size } from "./types";
+import { Casing, Size, SizeConstraintType } from "./types";
 
 export const cased = (value: string, casing: Casing): string => {
   if (casing === "lower") {
@@ -8,11 +8,6 @@ export const cased = (value: string, casing: Casing): string => {
   } else if (casing === "title") {
     return value.slice(0, 1).toUpperCase() + value.slice(1).toLowerCase();
   }
-};
-
-type SizeConstraintType = {
-  constraint?: ExportSettingsConstraints;
-  destSize: Size;
 };
 
 export const displaySize = (size: Size): string => {

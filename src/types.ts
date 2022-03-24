@@ -40,4 +40,9 @@ export interface AssetInfo {
   size: Size;
 }
 
+export type SizeConstraintType = {
+  constraint?: ExportSettingsConstraints;
+  destSize: Size;
+};
+
 export default {};
