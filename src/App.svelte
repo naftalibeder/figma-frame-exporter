@@ -3,6 +3,7 @@
   import { Button, Section, SelectMenu } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
   import type { Asset, AssetInfo, Casing, Config, Extension } from "./types";
+import { displaySize } from "./utils.js";
 
   interface CasingOption {
     value: Casing;
@@ -180,9 +181,7 @@
             {exampleAsset.filename}.{exampleAsset.extension.toLowerCase()}
           </span>
           <span>
-            {Math.round(exampleAsset.size.width)}x{Math.round(
-              exampleAsset.size.height
-            )}
+            {displaySize(exampleAsset.size)}
           </span>
         </div>
       {/each}
