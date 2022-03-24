@@ -1,5 +1,5 @@
 import { Exportable, Variant, Config, Asset, AssetInfo } from "./types";
-import { cased, log, sizeContraint } from "./utils";
+import { cased, exportSettings, log } from "./utils";
 
 figma.showUI(__html__, { width: 340, height: 542 });
 
@@ -64,23 +64,21 @@ const getAssets = async (
       } else {
         variantsStr += value;
       }
-    })
+    });
 
     let filename = syntax
       .replace("{frame}", cased(exportable.parentName, casing))
       .replace("{variant}", variantsStr);
 
-    const { constraint, destSize } = sizeContraint(
+    const { settings, destSize } = exportSettings(
+      extension,
       config.sizeConstraint,
       exportable.size
     );
 
     let data: Uint8Array;
     try {
-      data = await (<ExportMixin>node).exportAsync({
-        format: extension,
-        constraint,
-      });
+      data = await (<ExportMixin>node).exportAsync(settings);
     } catch (e) {
       log(e);
       continue;
@@ -90,10 +88,7 @@ const getAssets = async (
       filename,
       extension,
       data,
-      size: {
-        width: destSize.width,
-        height: destSize.height,
-      },
+      size: destSize,
     });
   }
 

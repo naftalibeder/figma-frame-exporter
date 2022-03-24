@@ -1,9 +1,15 @@
-<script lang="ts">
+<script lang="ts" type="module">
   import { onMount } from "svelte";
   import { Button, Section, SelectMenu } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
-  import type { Asset, AssetInfo, Casing, Config, Extension } from "./types";
-  import { displaySize } from "./utils.js";
+  import type {
+    Asset,
+    AssetInfo,
+    Casing,
+    Config,
+    Extension,
+    Size,
+  } from "./types";
 
   interface CasingOption {
     value: Casing;
@@ -39,6 +45,14 @@
 
   let nodeCount = 0;
   let exampleAssets: AssetInfo[] = [];
+
+  const displaySize = (size: Size): string => {
+    const rounded: Size = {
+      width: Math.round(size.width),
+      height: Math.round(size.height),
+    };
+    return `${rounded.width}x${rounded.height}`;
+  };
 
   const buildConfig = (): Config => {
     return {
@@ -155,6 +169,7 @@
       <input
         type="text"
         placeholder="E.g. 2x, 64w, 200h"
+        disabled={extensionOption.value === "SVG"}
         bind:value={sizeConstraint}
         on:input={onChangeConfig}
       />
@@ -180,9 +195,11 @@
           <span class="example-row-filename">
             {exampleAsset.filename}.{exampleAsset.extension.toLowerCase()}
           </span>
-          <span>
-            {displaySize(exampleAsset.size)}
-          </span>
+          {#if exampleAsset.size}
+            <span>
+              {displaySize(exampleAsset.size)}
+            </span>
+          {/if}
         </div>
       {/each}
     {:else}
@@ -260,6 +277,9 @@
   }
   input:hover {
     border-color: rgb(219, 219, 219);
+  }
+  input:disabled {
+    color: rgb(173, 173, 173);
   }
   ::-webkit-scrollbar {
     width: 0px;

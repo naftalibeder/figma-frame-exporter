@@ -31,18 +31,13 @@ export interface Asset {
   filename: string;
   extension: Extension;
   data: Uint8Array;
-  size: Size;
+  size?: Size;
 }
 
 export interface AssetInfo {
   filename: string;
   extension: Extension;
-  size: Size;
+  size?: Size;
 }
-
-export type SizeConstraintType = {
-  constraint?: ExportSettingsConstraints;
-  destSize: Size;
-};
 
 export default {};
