@@ -1,3 +1,8 @@
+# 5
+
+- Fixed connector appearing after frame name, even if there are no variants
+- Added PDF export option
+
 # 4
 
 - Added JPG and SVG export options
