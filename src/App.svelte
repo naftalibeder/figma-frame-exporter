@@ -37,7 +37,7 @@
     { value: "SVG", label: "SVG", group: null, selected: false },
   ];
 
-  let syntax = "{frame}.{variant}";
+  let syntax = "{frame}{connector}{variant}";
   let connector = ".";
   let casingOption = casingOptions[0];
   let sizeConstraint = "2x";
@@ -145,7 +145,7 @@
 
   <div class="row">
     <div class="section">
-      <Section>Variant connector</Section>
+      <Section>Connector</Section>
       <input
         type="text"
         placeholder="Enter a connector mark"

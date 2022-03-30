@@ -53,11 +53,11 @@ const getAssets = async (
 
   let assets: Asset[] = [];
 
-  for (const exportable of exportables) {
-    const node = figma.getNodeById(exportable.id) as SceneNode;
+  for (const e of exportables) {
+    const node = figma.getNodeById(e.id) as SceneNode;
 
     let variantsStr = "";
-    exportable.variants.forEach((variant, i) => {
+    e.variants.forEach((variant, i) => {
       const value = cased(variant.value, casing);
       if (i > 0) {
         variantsStr += `${connector}${value}`;
@@ -65,15 +65,17 @@ const getAssets = async (
         variantsStr += value;
       }
     });
+    const hasVariants = variantsStr.length > 0;
 
-    let filename = syntax
-      .replace("{frame}", cased(exportable.parentName, casing))
+    const filename = syntax
+      .replace("{frame}", cased(e.parentName, casing))
+      .replace("{connector}", hasVariants ? connector : "")
       .replace("{variant}", variantsStr);
 
     const { settings, destSize } = exportSettings(
       extension,
       config.sizeConstraint,
-      exportable.size
+      e.size
     );
 
     let data: Uint8Array;
