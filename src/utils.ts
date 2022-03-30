@@ -15,7 +15,7 @@ export const exportSettings = (
   constraint: string,
   srcSize: Size
 ): { settings: ExportSettings; destSize?: Size } => {
-  if (extension === "SVG") {
+  if (extension === "SVG" || extension === "PDF") {
     return {
       settings: {
         format: extension,

@@ -1,5 +1,5 @@
 export type Casing = "lower" | "upper" | "title";
-export type Extension = "PNG" | "JPG" | "SVG";
+export type Extension = "PNG" | "JPG" | "SVG" | "PDF";
 export type ConstraintType = "SCALE" | "WIDTH" | "HEIGHT";
 
 export interface Config {

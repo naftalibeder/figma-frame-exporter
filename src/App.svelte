@@ -35,6 +35,7 @@
     { value: "PNG", label: "PNG", group: null, selected: true },
     { value: "JPG", label: "JPG", group: null, selected: false },
     { value: "SVG", label: "SVG", group: null, selected: false },
+    { value: "PDF", label: "PDF", group: null, selected: false },
   ];
 
   let syntax = "{frame}{connector}{variant}";
