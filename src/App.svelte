@@ -2,14 +2,7 @@
   import { onMount } from "svelte";
   import { Button, Section, SelectMenu } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
-  import type {
-    Asset,
-    AssetInfo,
-    Casing,
-    Config,
-    Extension,
-    Size,
-  } from "./types";
+  import type { Asset, Casing, Config, Extension, Size } from "./types";
 
   interface CasingOption {
     value: Casing;
@@ -45,7 +38,7 @@
   let extensionOption = extensionOptions[0];
 
   let nodeCount = 0;
-  let exampleAssets: AssetInfo[] = [];
+  let exampleAssets: Asset[] = [];
 
   const displaySize = (size: Size): string => {
     const rounded: Size = {
@@ -65,15 +58,20 @@
     };
   };
 
-  window.onmessage = (event: MessageEvent) => {
+  window.onmessage = async (event: MessageEvent) => {
     const message = event.data.pluginMessage;
     const type = message.type;
 
     if (type === "refresh") {
       nodeCount = message.nodeCount;
       exampleAssets = message.exampleAssets;
+      exampleAssets = await buildPreviewImages(exampleAssets);
     } else if (type === "export") {
-      exportZip(message.assets);
+      const url = await buildZipArchive(message.assets);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "Export.zip";
+      link.click();
     }
   };
 
@@ -113,21 +111,27 @@
     );
   };
 
-  const exportZip = async (assets: Asset[]) => {
+  const buildPreviewImages = async (assets: Asset[]): Promise<Asset[]> => {
+    assets.forEach((asset) => {
+      let blob = new Blob([asset.data], { type: `image/png` });
+      const url = window.URL.createObjectURL(blob);
+      asset.url = url;
+    });
+    return assets;
+  };
+
+  const buildZipArchive = async (assets: Asset[]): Promise<string> => {
     let zip = new JSZip();
 
     assets.forEach((asset) => {
       const extensionLower = asset.extension.toLowerCase();
-      let blob = new Blob([asset.data!], { type: `image/${extensionLower}` });
+      let blob = new Blob([asset.data], { type: `image/${extensionLower}` });
       zip.file(`${asset.filename}.${extensionLower}`, blob, { base64: true });
     });
 
     const blob = await zip.generateAsync({ type: "blob" });
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "Export.zip";
-    link.click();
+    return url;
   };
 </script>
 
@@ -193,6 +197,11 @@
           <hr />
         {/if}
         <div class="example-row">
+          <img
+            class="example-row-thumb"
+            src={exampleAsset.url}
+            alt="asset thumbnail"
+          />
           <span class="example-row-filename">
             {exampleAsset.filename}.{exampleAsset.extension.toLowerCase()}
           </span>
@@ -254,10 +263,15 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    gap: 8px;
+    gap: 4px;
+  }
+  .example-row-thumb {
+    width: 16px;
+    height: 16px;
   }
   .example-row-filename {
     display: flex;
+    flex: 1;
     white-space: nowrap;
     overflow-x: scroll;
   }

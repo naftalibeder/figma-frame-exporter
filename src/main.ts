@@ -1,4 +1,4 @@
-import { Exportable, Variant, Config, Asset, AssetInfo } from "./types";
+import { Exportable, Variant, Config, Asset, Size } from "./types";
 import { withCasing, buildExportSettings, log } from "./utils";
 
 figma.showUI(__html__, { width: 340, height: 492 });
@@ -48,7 +48,7 @@ const getExportables = (): Exportable[] => {
 const getAssets = async (
   exportables: readonly Exportable[],
   config: Config,
-  shouldGenerateData: boolean,
+  isFinal: boolean,
 ): Promise<Asset[]> => {
   const { syntax, connector, casing, extension } = config;
 
@@ -73,27 +73,41 @@ const getAssets = async (
       .replace("{connector}", hasVariants ? connector : "")
       .replace("{variant}", variantsStr);
 
-    const { settings, destSize } = buildExportSettings(
-      extension,
-      config.sizeConstraint,
-      e.size
-    );
-
     let data: Uint8Array;
-    if (shouldGenerateData) {
-      try {
-        data = await (<ExportMixin>node).exportAsync(settings);
-      } catch (e) {
-        log(e);
-        continue;
+    let size: Size;
+    try {
+      const exportConfigInfo = {
+        extension: extension,
+        constraint: config.sizeConstraint,
+        srcSize: e.size,
+      };
+      const { destSize } = buildExportSettings(exportConfigInfo);
+
+      const exportConfigData = {
+        extension: extension,
+        constraint: config.sizeConstraint,
+        srcSize: e.size,
+      };
+      log(isFinal);
+      if (!isFinal) {
+        // Limit generated size of preview images.
+        exportConfigData.constraint = '';
+        exportConfigData.srcSize = { width: 16, height: 16 };
       }
+      const { settings } = buildExportSettings(exportConfigData);
+      size = destSize;
+      data = await (<ExportMixin>node).exportAsync(settings);
+    } catch (e) {
+      log(e);
+      continue;
     }
 
     assets.push({
       filename,
       extension,
+      size,
       data,
-      size: destSize,
+      isFinal,
     });
   }
 
@@ -103,16 +117,9 @@ const getAssets = async (
 const refreshUI = async () => {
   const exportables = getExportables();
 
-  let exampleAssets: AssetInfo[] = [];
+  let exampleAssets: Asset[] = [];
   if (storedConfig) {
-    const assets = await getAssets(exportables, storedConfig, false);
-    exampleAssets = assets.map((a) => {
-      return {
-        filename: a.filename,
-        extension: a.extension,
-        size: a.size,
-      };
-    });
+    exampleAssets = await getAssets(exportables, storedConfig, false);
   }
 
   figma.ui.postMessage({
