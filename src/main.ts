@@ -53,10 +53,10 @@ const getAssets = async (
   const { syntax, connector, casing, extension } = config;
 
   let assets: Asset[] = [];
-
   for (const e of exportables) {
     const node = figma.getNodeById(e.id) as SceneNode;
 
+    // Handle variants.
     let variantsStr = "";
     e.variants.forEach((variant, i) => {
       const value = withCasing(variant.value, casing);
@@ -68,11 +68,13 @@ const getAssets = async (
     });
     const hasVariants = variantsStr.length > 0;
 
+    // Build filename.
     const filename = syntax
       .replace("{frame}", withCasing(e.parentName, casing))
       .replace("{connector}", hasVariants ? connector : "")
       .replace("{variant}", variantsStr);
 
+    // Generate image data.
     let data: Uint8Array;
     let size: Size;
     try {
@@ -88,7 +90,6 @@ const getAssets = async (
         constraint: config.sizeConstraint,
         srcSize: e.size,
       };
-      log(isFinal);
       if (!isFinal) {
         // Limit generated size of preview images.
         exportConfigData.constraint = '';
