@@ -1,5 +1,5 @@
 import { Exportable, Variant, Config, Asset, AssetInfo } from "./types";
-import { cased, exportSettings, log } from "./utils";
+import { withCasing, buildExportSettings, log } from "./utils";
 
 figma.showUI(__html__, { width: 340, height: 492 });
 
@@ -59,7 +59,7 @@ const getAssets = async (
 
     let variantsStr = "";
     e.variants.forEach((variant, i) => {
-      const value = cased(variant.value, casing);
+      const value = withCasing(variant.value, casing);
       if (i > 0) {
         variantsStr += `${connector}${value}`;
       } else {
@@ -69,11 +69,11 @@ const getAssets = async (
     const hasVariants = variantsStr.length > 0;
 
     const filename = syntax
-      .replace("{frame}", cased(e.parentName, casing))
+      .replace("{frame}", withCasing(e.parentName, casing))
       .replace("{connector}", hasVariants ? connector : "")
       .replace("{variant}", variantsStr);
 
-    const { settings, destSize } = exportSettings(
+    const { settings, destSize } = buildExportSettings(
       extension,
       config.sizeConstraint,
       e.size

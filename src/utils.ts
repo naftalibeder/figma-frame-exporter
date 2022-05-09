@@ -1,6 +1,6 @@
 import { Casing, Extension, Size } from "./types";
 
-export const cased = (value: string, casing: Casing): string => {
+export const withCasing = (value: string, casing: Casing): string => {
   if (casing === "lower") {
     return value.toLowerCase();
   } else if (casing === "upper") {
@@ -10,7 +10,7 @@ export const cased = (value: string, casing: Casing): string => {
   }
 };
 
-export const exportSettings = (
+export const buildExportSettings = (
   extension: Extension,
   constraint: string,
   srcSize: Size
@@ -70,7 +70,7 @@ export const exportSettings = (
 };
 
 export const log = (...args: any[]) => {
-  console.log(...args);
+  console.log('[Frame Exporter]', ...args);
 };
 
 export default {};
