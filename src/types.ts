@@ -8,6 +8,7 @@ export interface Config {
   casing: Casing;
   sizeConstraint: string;
   extension: Extension;
+  hideNodes: string[];
 }
 
 export interface Size {
