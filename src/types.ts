@@ -30,14 +30,10 @@ export interface Exportable {
 export interface Asset {
   filename: string;
   extension: Extension;
+  size?: Size;
   data: Uint8Array;
-  size?: Size;
-}
-
-export interface AssetInfo {
-  filename: string;
-  extension: Extension;
-  size?: Size;
+  url?: string;
+  isFinal: boolean;
 }
 
 export default {};
