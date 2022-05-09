@@ -1,7 +1,7 @@
 import { Exportable, Variant, Config, Asset, Size } from "./types";
 import { withCasing, buildExportSettings, log } from "./utils";
 
-figma.showUI(__html__, { width: 340, height: 492 });
+figma.showUI(__html__, { width: 340, height: 560 });
 
 let storedConfig: Config | undefined;
 
@@ -50,13 +50,32 @@ const getAssets = async (
   config: Config,
   isFinal: boolean,
 ): Promise<Asset[]> => {
-  const { syntax, connector, casing, extension } = config;
+  const { syntax, connector, casing, extension, hideNodes } = config;
+
+  // Create temporary frame to store modified frames.
+  const tmp = figma.createFrame();
+  tmp.name = 'tmp'
+  tmp.resize(1000, 1000);
 
   let assets: Asset[] = [];
-  for (const e of exportables) {
-    const node = figma.getNodeById(e.id) as SceneNode;
 
-    // Handle variants.
+  for (const e of exportables) {
+    let asset: Asset = {
+      filename: '',
+      extension: config.extension,
+      size: undefined,
+      data: new Uint8Array,
+      isFinal,
+    };
+
+    let originalNode = figma.getNodeById(e.id) as FrameNode;
+
+    // Modify node if needed.
+    let modifiedNode = originalNode.clone();
+    modifiedNode = withModificationsForExport(modifiedNode, hideNodes);
+    tmp.appendChild(modifiedNode);
+
+    // Build filename.
     let variantsStr = "";
     e.variants.forEach((variant, i) => {
       const value = withCasing(variant.value, casing);
@@ -67,53 +86,49 @@ const getAssets = async (
       }
     });
     const hasVariants = variantsStr.length > 0;
-
-    // Build filename.
     const filename = syntax
       .replace("{frame}", withCasing(e.parentName, casing))
       .replace("{connector}", hasVariants ? connector : "")
       .replace("{variant}", variantsStr);
+    asset.filename = filename;
 
     // Generate image data.
-    let data: Uint8Array;
-    let size: Size;
+    const baseExportConfig = {
+      extension,
+      constraint: config.sizeConstraint,
+      srcSize: e.size,
+    };
+    const { destSize } = buildExportSettings(baseExportConfig);
+    asset.size = destSize;
+    const { settings } = buildExportSettings(isFinal ? baseExportConfig : {
+      extension,
+      constraint: '',
+      srcSize: { width: 16, height: 16 },
+    });
     try {
-      const exportConfigInfo = {
-        extension: extension,
-        constraint: config.sizeConstraint,
-        srcSize: e.size,
-      };
-      const { destSize } = buildExportSettings(exportConfigInfo);
-
-      const exportConfigData = {
-        extension: extension,
-        constraint: config.sizeConstraint,
-        srcSize: e.size,
-      };
-      if (!isFinal) {
-        // Limit generated size of preview images.
-        exportConfigData.constraint = '';
-        exportConfigData.srcSize = { width: 16, height: 16 };
-      }
-      const { settings } = buildExportSettings(exportConfigData);
-      size = destSize;
-      data = await (<ExportMixin>node).exportAsync(settings);
+      asset.data = await (<ExportMixin>modifiedNode).exportAsync(settings);
     } catch (e) {
       log(e);
       continue;
     }
 
-    assets.push({
-      filename,
-      extension,
-      size,
-      data,
-      isFinal,
-    });
+    assets.push(asset);
   }
+
+  // Clean up temporary frame.
+  tmp.remove();
 
   return assets;
 };
+
+const withModificationsForExport = (node: FrameNode, hideNodes: string[]): FrameNode => {
+  const nodesToHide = node.findAll(c => hideNodes.includes(c.name));
+  for (const n of nodesToHide) {
+    n.visible = false;
+  }
+
+  return node;
+}
 
 const refreshUI = async () => {
   const exportables = getExportables();

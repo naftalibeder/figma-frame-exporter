@@ -36,6 +36,7 @@
   let casingOption = casingOptions[0];
   let sizeConstraint = "2x";
   let extensionOption = extensionOptions[0];
+  let hideNodes = "";
 
   let nodeCount = 0;
   let exampleAssets: Asset[] = [];
@@ -55,6 +56,7 @@
       casing: casingOption.value,
       sizeConstraint,
       extension: extensionOption.value,
+      hideNodes: hideNodes.split(",").map((o) => o.trim()),
     };
   };
 
@@ -185,6 +187,18 @@
         bind:menuItems={extensionOptions}
         bind:value={extensionOption}
         on:change={onChangeConfig}
+      />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="section">
+      <Section>Hide children</Section>
+      <input
+        type="text"
+        placeholder="Comma-separated layer names"
+        bind:value={hideNodes}
+        on:input={onChangeConfig}
       />
     </div>
   </div>
