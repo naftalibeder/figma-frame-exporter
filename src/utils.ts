@@ -10,11 +10,17 @@ export const withCasing = (value: string, casing: Casing): string => {
   }
 };
 
-export const buildExportSettings = (
+export const buildExportSettings = (config: {
   extension: Extension,
   constraint: string,
   srcSize: Size
-): { settings: ExportSettings; destSize?: Size } => {
+}): { settings: ExportSettings; destSize?: Size } => {
+  const {
+    extension,
+    constraint,
+    srcSize,
+  } = config;
+
   if (extension === "SVG" || extension === "PDF") {
     return {
       settings: {
