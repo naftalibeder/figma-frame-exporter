@@ -47,7 +47,8 @@ const getExportables = (): Exportable[] => {
 
 const getAssets = async (
   exportables: readonly Exportable[],
-  config: Config
+  config: Config,
+  shouldGenerateData: boolean,
 ): Promise<Asset[]> => {
   const { syntax, connector, casing, extension } = config;
 
@@ -79,11 +80,13 @@ const getAssets = async (
     );
 
     let data: Uint8Array;
-    try {
-      data = await (<ExportMixin>node).exportAsync(settings);
-    } catch (e) {
-      log(e);
-      continue;
+    if (shouldGenerateData) {
+      try {
+        data = await (<ExportMixin>node).exportAsync(settings);
+      } catch (e) {
+        log(e);
+        continue;
+      }
     }
 
     assets.push({
@@ -102,7 +105,7 @@ const refreshUI = async () => {
 
   let exampleAssets: AssetInfo[] = [];
   if (storedConfig) {
-    const assets = await getAssets(exportables, storedConfig);
+    const assets = await getAssets(exportables, storedConfig, false);
     exampleAssets = assets.map((a) => {
       return {
         filename: a.filename,
@@ -130,7 +133,7 @@ figma.ui.onmessage = async (message) => {
     refreshUI();
   } else if (type === "export") {
     const exportables = getExportables();
-    const assets = await getAssets(exportables, message.config);
+    const assets = await getAssets(exportables, message.config, true);
     figma.ui.postMessage({ type: "export", assets });
   } else if (type === "cancel") {
     figma.closePlugin();
