@@ -86,8 +86,6 @@
 
     if (type === "load") {
       const config = message.config as Config;
-      console.log("Loaded stored config:", config);
-
       syntax = config.syntax;
       connector = config.connector;
       casing = config.casing;

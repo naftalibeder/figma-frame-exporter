@@ -75,8 +75,8 @@ const getAssets = async (
 
   // Create temporary frame to store modified frames.
   const tmp = figma.createFrame();
-  tmp.name = 'tmp'
-  tmp.resize(1000, 1000);
+  tmp.name = '~tmp';
+  tmp.clipsContent = false;
 
   let assets: Asset[] = [];
 
@@ -172,26 +172,41 @@ const refreshPreview = async (config: Config | undefined) => {
   });
 };
 
+const generateExport = async (config: Config) => {
+  const exportables = getExportables();
+  const assets = await getAssets(
+    exportables,
+    config,
+    { isFinal: true },
+  );
+  figma.ui.postMessage({
+    type: "export",
+    assets,
+  });
+};
+
 figma.ui.onmessage = async (message) => {
   const type = message.type;
+  log('Message:', type);
 
   if (type === "init") {
     const storedConfig = await StoredConfig.get();
+    log("Loaded stored config:", storedConfig);
     figma.ui.postMessage({ type: "load", config: storedConfig });
-    refreshPreview(storedConfig);
+    await refreshPreview(storedConfig);
   } else if (type === "config") {
     const storedConfig = await StoredConfig.set(message.config);
-    refreshPreview(storedConfig);
+    await refreshPreview(storedConfig);
   } else if (type === "export") {
-    const exportables = getExportables();
-    const assets = await getAssets(exportables, message.config, { isFinal: true });
-    figma.ui.postMessage({ type: "export", assets });
-  } else if (type === "cancel") {
-    figma.closePlugin();
+    await generateExport(message.config);
   }
 };
 
 figma.on("selectionchange", async () => {
   const storedConfig = await StoredConfig.get();
   await refreshPreview(storedConfig);
+});
+
+figma.on('close', () => {
+  log('closed');
 });
