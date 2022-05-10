@@ -1,3 +1,7 @@
+# 8
+
+- Fixed bug that allowed multiple temporary frames to persist in the hierarchy
+
 # 7
 
 - Improved cover image
