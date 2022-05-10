@@ -26,6 +26,28 @@ class StoredConfig {
   };
 }
 
+class TempFrame {
+  frame: FrameNode | undefined;
+
+  create = () => {
+    if (this.frame) {
+      this.frame.remove();
+      this.frame = undefined;
+    }
+
+    this.frame = figma.createFrame();
+    this.frame.name = "[Frame Exporter]";
+    this.frame.clipsContent = false;
+    this.frame = this.frame;
+  };
+
+  remove = () => {
+    this.frame?.remove();
+    this.frame = undefined;
+  };
+}
+const tempFrame = new TempFrame();
+
 const getExportables = (): Exportable[] => {
   const nodes = figma.currentPage.selection;
   const exportables: Exportable[] = [];
@@ -53,7 +75,7 @@ const getExportables = (): Exportable[] => {
           size: { width: child.width, height: child.height },
         });
       }
-    } else {
+    } else if (node.type === 'FRAME') {
       exportables.push({
         id: node.id,
         parentName: node.name,
@@ -73,10 +95,7 @@ const getAssets = async (
 ): Promise<Asset[]> => {
   const { syntax, connector, casing, extension, sizeConstraint, hideNodes } = config;
 
-  // Create temporary frame to store modified frames.
-  const tmp = figma.createFrame();
-  tmp.name = '~tmp';
-  tmp.clipsContent = false;
+  tempFrame.create();
 
   let assets: Asset[] = [];
 
@@ -93,7 +112,9 @@ const getAssets = async (
     // Modify node if needed.
     let modifiedNode = originalNode.clone();
     modifiedNode = withModificationsForExport(modifiedNode, hideNodes);
-    tmp.appendChild(modifiedNode);
+    if (tempFrame.frame) {
+      tempFrame.frame.appendChild(modifiedNode);
+    }
 
     // Build filename.
     let variantsStr = "";
@@ -135,8 +156,7 @@ const getAssets = async (
     assets.push(asset);
   }
 
-  // Clean up temporary frame.
-  tmp.remove();
+  tempFrame.remove();
 
   return assets;
 };
@@ -208,5 +228,6 @@ figma.on("selectionchange", async () => {
 });
 
 figma.on('close', () => {
+  tempFrame.remove();
   log('closed');
 });
