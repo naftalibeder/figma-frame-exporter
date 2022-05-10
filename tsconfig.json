@@ -6,10 +6,11 @@
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@figma",
+      "./src/constants",
       "./src/types"
     ],
     "paths": {
-      "@utils/*": ["./src/utils/*"]
+      "*": ["./src/*"],
     },
     "allowSyntheticDefaultImports": true
   }
