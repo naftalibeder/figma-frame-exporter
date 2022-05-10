@@ -1,4 +1,4 @@
-export type Casing = "lower" | "upper" | "title";
+export type Casing = "original" | "lower" | "upper" | "title";
 export type Extension = "PNG" | "JPG" | "SVG" | "PDF";
 export type ConstraintType = "SCALE" | "WIDTH" | "HEIGHT";
 
