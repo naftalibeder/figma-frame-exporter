@@ -3,7 +3,28 @@ import { withCasing, buildExportSettings, log } from "./utils";
 
 figma.showUI(__html__, { width: 340, height: 560 });
 
-let storedConfig: Config | undefined;
+class StoredConfig {
+  static get = async (): Promise<Config> => {
+    let _config = await figma.clientStorage.getAsync('config');
+    if (!_config) {
+      return {
+        syntax: "{frame}{connector}{variant}",
+        connector: '.',
+        casing: 'lower',
+        sizeConstraint: '2x',
+        extension: 'PNG',
+        hideNodes: [],
+      }
+    } else {
+      return _config;
+    }
+  };
+
+  static set = async (_config: Config): Promise<Config> => {
+    await figma.clientStorage.setAsync('config', _config);
+    return _config;
+  };
+}
 
 const getExportables = (): Exportable[] => {
   const nodes = figma.currentPage.selection;
@@ -130,18 +151,20 @@ const withModificationsForExport = (node: FrameNode, hideNodes: string[]): Frame
   return node;
 }
 
-const refreshUI = async () => {
+const refreshPreview = async (config: Config | undefined) => {
   const exportables = getExportables();
 
   let exampleAssets: Asset[] = [];
-  if (storedConfig) {
-    exampleAssets = await getAssets(exportables, storedConfig, false);
+  if (config) {
+    exampleAssets = await getAssets(exportables, config, false);
   }
 
   figma.ui.postMessage({
-    type: "refresh",
-    nodeCount: exportables.length,
-    exampleAssets,
+    type: "preview",
+    preview: {
+      nodeCount: exportables.length,
+      exampleAssets,
+    }
   });
 };
 
@@ -149,11 +172,12 @@ figma.ui.onmessage = async (message) => {
   const type = message.type;
 
   if (type === "init") {
-    storedConfig = message.config;
-    refreshUI();
+    const storedConfig = await StoredConfig.get();
+    figma.ui.postMessage({ type: "load", config: storedConfig });
+    refreshPreview(storedConfig);
   } else if (type === "config") {
-    storedConfig = message.config;
-    refreshUI();
+    const storedConfig = await StoredConfig.set(message.config);
+    refreshPreview(storedConfig);
   } else if (type === "export") {
     const exportables = getExportables();
     const assets = await getAssets(exportables, message.config, true);
@@ -163,6 +187,7 @@ figma.ui.onmessage = async (message) => {
   }
 };
 
-figma.on("selectionchange", () => {
-  refreshUI();
+figma.on("selectionchange", async () => {
+  const storedConfig = await StoredConfig.get();
+  await refreshPreview(storedConfig);
 });

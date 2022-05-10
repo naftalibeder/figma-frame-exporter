@@ -3,6 +3,7 @@
   import { Button, Section, SelectMenu } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
   import type { Asset, Casing, Config, Extension, Size } from "./types";
+  import { isVariableDeclarationList } from "typescript";
 
   interface CasingOption {
     value: Casing;
@@ -18,25 +19,45 @@
     selected: boolean;
   }
 
+  let syntax: string | undefined = undefined;
+  let connector: string | undefined = undefined;
+
+  let casing: Casing | undefined = undefined;
   let casingOptions: CasingOption[] = [
-    { value: "lower", label: "Lower", group: null, selected: true },
+    { value: "lower", label: "Lower", group: null, selected: false },
     { value: "upper", label: "Upper", group: null, selected: false },
     { value: "title", label: "Title", group: null, selected: false },
   ];
+  $: {
+    casingOptions.forEach((o, i) => {
+      casingOptions[i].selected = o.value === casing;
+    });
+  }
 
+  let sizeConstraint: string | undefined = undefined;
+
+  let extension: Extension | undefined = undefined;
   let extensionOptions: ExtensionOption[] = [
-    { value: "PNG", label: "PNG", group: null, selected: true },
+    { value: "PNG", label: "PNG", group: null, selected: false },
     { value: "JPG", label: "JPG", group: null, selected: false },
     { value: "SVG", label: "SVG", group: null, selected: false },
     { value: "PDF", label: "PDF", group: null, selected: false },
   ];
+  $: {
+    extensionOptions.forEach((o, i) => {
+      extensionOptions[i].selected = o.value === extension;
+    });
+  }
 
-  let syntax = "{frame}{connector}{variant}";
-  let connector = ".";
-  let casingOption = casingOptions[0];
-  let sizeConstraint = "2x";
-  let extensionOption = extensionOptions[0];
-  let hideNodes = "";
+  let hideNodesStr = "";
+  let hideNodes: string[] = [];
+  $: {
+    hideNodes = hideNodesStr
+      .split(",")
+      .map((o) => o.trim())
+      .filter((o) => o.length > 0);
+    console.log(hideNodes);
+  }
 
   let nodeCount = 0;
   let exampleAssets: Asset[] = [];
@@ -53,10 +74,10 @@
     return {
       syntax,
       connector,
-      casing: casingOption.value,
+      casing,
       sizeConstraint,
-      extension: extensionOption.value,
-      hideNodes: hideNodes.split(",").map((o) => o.trim()),
+      extension,
+      hideNodes,
     };
   };
 
@@ -64,9 +85,20 @@
     const message = event.data.pluginMessage;
     const type = message.type;
 
-    if (type === "refresh") {
-      nodeCount = message.nodeCount;
-      exampleAssets = message.exampleAssets;
+    if (type === "load") {
+      const config = message.config as Config;
+      console.log("Loaded stored config:", config);
+
+      syntax = config.syntax;
+      connector = config.connector;
+      casing = config.casing;
+      sizeConstraint = config.sizeConstraint;
+      extension = config.extension;
+      hideNodesStr = config.hideNodes.join(", ");
+    } else if (type === "preview") {
+      const preview = message.preview;
+      nodeCount = preview.nodeCount;
+      exampleAssets = preview.exampleAssets;
       exampleAssets = await buildPreviewImages(exampleAssets);
     } else if (type === "export") {
       const url = await buildZipArchive(message.assets);
@@ -82,14 +114,13 @@
       {
         pluginMessage: {
           type: "init",
-          config: buildConfig(),
         },
       },
       "*"
     );
   });
 
-  const onChangeConfig = (e) => {
+  const onChangeConfig = () => {
     parent.postMessage(
       {
         pluginMessage: {
@@ -164,8 +195,10 @@
       <Section>Capitalization</Section>
       <SelectMenu
         bind:menuItems={casingOptions}
-        bind:value={casingOption}
-        on:change={onChangeConfig}
+        on:change={(e) => {
+          casing = e.detail.value;
+          onChangeConfig();
+        }}
       />
     </div>
   </div>
@@ -176,7 +209,7 @@
       <input
         type="text"
         placeholder="E.g. 2x, 64w, 200h"
-        disabled={extensionOption.value === "SVG"}
+        disabled={!extension || extension === "SVG"}
         bind:value={sizeConstraint}
         on:input={onChangeConfig}
       />
@@ -185,8 +218,10 @@
       <Section>Format</Section>
       <SelectMenu
         bind:menuItems={extensionOptions}
-        bind:value={extensionOption}
-        on:change={onChangeConfig}
+        on:change={(e) => {
+          extension = e.detail.value;
+          onChangeConfig();
+        }}
       />
     </div>
   </div>
@@ -197,7 +232,7 @@
       <input
         type="text"
         placeholder="Comma-separated layer names"
-        bind:value={hideNodes}
+        bind:value={hideNodesStr}
         on:input={onChangeConfig}
       />
     </div>
