@@ -10,7 +10,7 @@ class StoredConfig {
       return {
         syntax: "{frame}{connector}{variant}",
         connector: '.',
-        casing: 'lower',
+        casing: 'original',
         sizeConstraint: '2x',
         extension: 'PNG',
         hideNodes: [],

@@ -23,6 +23,7 @@
 
   let casing: Casing | undefined = undefined;
   let casingOptions: CasingOption[] = [
+    { value: "original", label: "Original", group: null, selected: false },
     { value: "lower", label: "Lower", group: null, selected: false },
     { value: "upper", label: "Upper", group: null, selected: false },
     { value: "title", label: "Title", group: null, selected: false },
