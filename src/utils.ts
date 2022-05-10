@@ -7,6 +7,8 @@ export const withCasing = (value: string, casing: Casing): string => {
     return value.toUpperCase();
   } else if (casing === "title") {
     return value.slice(0, 1).toUpperCase() + value.slice(1).toLowerCase();
+  } else {
+    return value;
   }
 };
 
