@@ -1,3 +1,7 @@
+# 7
+
+- Improved cover image
+
 # 6
 
 - Added saving state between sessions
