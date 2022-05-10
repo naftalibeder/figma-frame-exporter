@@ -34,7 +34,11 @@ export interface Asset {
   size?: Size;
   data: Uint8Array;
   url?: string;
+}
+
+export interface PreviewSettings {
   isFinal: boolean;
+  thumbSize?: Size;
 }
 
 export default {};
