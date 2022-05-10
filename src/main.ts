@@ -1,4 +1,4 @@
-import { Exportable, Variant, Config, Asset, Size } from "./types";
+import { Exportable, Variant, Config, Asset, PreviewSettings } from "./types";
 import { withCasing, buildExportSettings, log } from "./utils";
 
 figma.showUI(__html__, { width: 340, height: 560 });
@@ -69,9 +69,9 @@ const getExportables = (): Exportable[] => {
 const getAssets = async (
   exportables: readonly Exportable[],
   config: Config,
-  isFinal: boolean,
+  previewSettings: PreviewSettings,
 ): Promise<Asset[]> => {
-  const { syntax, connector, casing, extension, hideNodes } = config;
+  const { syntax, connector, casing, extension, sizeConstraint, hideNodes } = config;
 
   // Create temporary frame to store modified frames.
   const tmp = figma.createFrame();
@@ -83,10 +83,9 @@ const getAssets = async (
   for (const e of exportables) {
     let asset: Asset = {
       filename: '',
-      extension: config.extension,
+      extension,
       size: undefined,
       data: new Uint8Array,
-      isFinal,
     };
 
     let originalNode = figma.getNodeById(e.id) as FrameNode;
@@ -116,15 +115,15 @@ const getAssets = async (
     // Generate image data.
     const baseExportConfig = {
       extension,
-      constraint: config.sizeConstraint,
+      constraint: sizeConstraint,
       srcSize: e.size,
     };
     const { destSize } = buildExportSettings(baseExportConfig);
     asset.size = destSize;
-    const { settings } = buildExportSettings(isFinal ? baseExportConfig : {
-      extension,
+    const { settings } = buildExportSettings(previewSettings.isFinal ? baseExportConfig : {
+      extension: 'JPG',
       constraint: '',
-      srcSize: { width: 16, height: 16 },
+      srcSize: previewSettings.thumbSize,
     });
     try {
       asset.data = await (<ExportMixin>modifiedNode).exportAsync(settings);
@@ -156,7 +155,12 @@ const refreshPreview = async (config: Config | undefined) => {
 
   let exampleAssets: Asset[] = [];
   if (config) {
-    exampleAssets = await getAssets(exportables, config, false);
+    exampleAssets = await getAssets(
+      exportables,
+      config,
+      {
+        isFinal: false, thumbSize: { width: 32, height: 32 }
+      });
   }
 
   figma.ui.postMessage({
@@ -180,7 +184,7 @@ figma.ui.onmessage = async (message) => {
     refreshPreview(storedConfig);
   } else if (type === "export") {
     const exportables = getExportables();
-    const assets = await getAssets(exportables, message.config, true);
+    const assets = await getAssets(exportables, message.config, { isFinal: true });
     figma.ui.postMessage({ type: "export", assets });
   } else if (type === "cancel") {
     figma.closePlugin();

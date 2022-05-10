@@ -3,7 +3,6 @@
   import { Button, Section, SelectMenu } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
   import type { Asset, Casing, Config, Extension, Size } from "./types";
-  import { isVariableDeclarationList } from "typescript";
 
   interface CasingOption {
     value: Casing;
@@ -56,7 +55,6 @@
       .split(",")
       .map((o) => o.trim())
       .filter((o) => o.length > 0);
-    console.log(hideNodes);
   }
 
   let nodeCount = 0;
@@ -312,11 +310,12 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     gap: 4px;
   }
   .example-row-thumb {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
   }
   .example-row-filename {
     display: flex;
