@@ -170,7 +170,7 @@
 <div class="wrap">
   <div class="row">
     <div class="section">
-      <Section>Filename</Section>
+      <Section>File name</Section>
       <input
         type="text"
         placeholder="Enter a syntax"
@@ -227,10 +227,10 @@
 
   <div class="row">
     <div class="section">
-      <Section>Hide children</Section>
+      <Section>Exclude child layers</Section>
       <input
         type="text"
-        placeholder="Comma-separated layer names"
+        placeholder="E.g. Background, Ellipse 24, Icon-Content"
         bind:value={hideNodesStr}
         on:input={onChangeConfig}
       />
