@@ -8,9 +8,9 @@ import svg from "rollup-plugin-svg";
 import typescript from "@rollup/plugin-typescript";
 import sveltePreprocess from "svelte-preprocess";
 import htmlBundle from "rollup-plugin-html-bundle";
-import alias from "@rollup/plugin-alias";
 import postcss from "rollup-plugin-postcss";
 import cssnano from "cssnano";
+import childProcess from "child_process";
 
 const production = !process.env.ROLLUP_WATCH;
 const projectDir = path.resolve(__dirname);
@@ -39,6 +39,7 @@ export default [
           importee === "svelte" || importee.startsWith("svelte/"),
         extensions: [".svelte", ".mjs", ".js", ".json", ".node"],
       }),
+      typescript(),
       commonjs(),
       svg(),
       postcss({
@@ -49,12 +50,6 @@ export default [
         template: "src/index.html",
         target: "build/index.html",
         inline: true,
-      }),
-      alias({
-        // Duplicate in `.tsconfig`.
-        entries: {
-          "@utils": path.resolve(projectDir, "src/utils"),
-        },
       }),
       !production && serve(),
       !production && livereload("build"),
@@ -83,7 +78,7 @@ function serve() {
       if (!started) {
         started = true;
 
-        require("child_process").spawn("npm", ["run", "start", "--", "--dev"], {
+        childProcess.spawn("npm", ["run", "start", "--", "--dev"], {
           stdio: ["ignore", "inherit", "inherit"],
           shell: true,
         });
