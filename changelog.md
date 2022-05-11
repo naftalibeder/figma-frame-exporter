@@ -1,6 +1,6 @@
 # 9
 
-- Added additional text formatting options, like snake, camel and kebab.
+- Added additional text formatting options, like snake, camel and kebab
 
 # 8
 
