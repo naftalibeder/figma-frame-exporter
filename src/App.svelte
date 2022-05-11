@@ -1,8 +1,16 @@
 <script lang="ts" type="module">
   import { onMount } from "svelte";
   import { Button, Section, SelectMenu } from "figma-plugin-ds-svelte";
+  import convertCase from "../node_modules/js-convert-case/lib/index";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
-  import type { Asset, Casing, Config, Extension, Size } from "./types";
+  import {
+    Asset,
+    Casing,
+    casingStrings,
+    Config,
+    Extension,
+    Size,
+  } from "./types";
 
   interface CasingOption {
     value: Casing;
@@ -22,12 +30,15 @@
   let connector: string | undefined = undefined;
 
   let casing: Casing | undefined = undefined;
-  let casingOptions: CasingOption[] = [
-    { value: "original", label: "Original", group: null, selected: false },
-    { value: "lower", label: "Lower", group: null, selected: false },
-    { value: "upper", label: "Upper", group: null, selected: false },
-    { value: "title", label: "Title", group: null, selected: false },
-  ];
+  let casingOptions: CasingOption[] = casingStrings.map((s) => {
+    return {
+      value: s,
+      label: convertCase.toSentenceCase(s),
+      group: null,
+      selected: false,
+    };
+  });
+
   $: {
     casingOptions.forEach((o, i) => {
       casingOptions[i].selected = o.value === casing;
@@ -225,10 +236,10 @@
 
   <div class="row">
     <div class="section">
-      <Section>Exclude child layers</Section>
+      <Section>Exclude sublayers</Section>
       <input
         type="text"
-        placeholder="E.g. Background, Ellipse 24, Icon-Content"
+        placeholder="E.g. 'Background, Icon-Content'"
         bind:value={hideNodesStr}
         on:input={onChangeConfig}
       />
