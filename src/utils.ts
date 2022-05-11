@@ -2,31 +2,22 @@ import convertCase from "../node_modules/js-convert-case/lib/index";
 
 import { Casing, Extension, Size } from "./types";
 
-export const withCasing = (value: string, casing: Casing): string => {
-  const _convert = (v: string) => {
-    switch (casing) {
-      case "lower":
-        return convertCase.toLowerCase(v);
-      case "upper":
-        return convertCase.toUpperCase(v);
-      case "title":
-        return convertCase.toHeaderCase(v);
-      case 'snake':
-        return convertCase.toSnakeCase(v);
-      case 'kebab':
-        return convertCase.toKebabCase(v);
-      case 'camel':
-        return convertCase.toCamelCase(v);
-      case 'pascal':
-        return convertCase.toPascalCase(v);
-      case 'dot':
-        return convertCase.toDotCase(v);
-      default:
-        return v;
-    }
-  }
+const caseMap: Record<Casing, ((s: string) => string)> = {
+  original: (s) => s,
+  lower: convertCase.toLowerCase,
+  upper: convertCase.toUpperCase,
+  title: convertCase.toHeaderCase,
+  snake: convertCase.toSnakeCase,
+  kebab: convertCase.toKebabCase,
+  camel: convertCase.toCamelCase,
+  pascal: convertCase.toPascalCase,
+  dot: convertCase.toDotCase,
+};
 
-  const values = value.split('/').map(o => _convert(o.trim())).join(' / ');
+export const withCasing = (value: string, casing: Casing): string => {
+  const values = value.split('/')
+    .map(o => caseMap[casing](o.trim()))
+    .join(' / ');
   return values;
 };
 
