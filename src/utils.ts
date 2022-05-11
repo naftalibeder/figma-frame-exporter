@@ -1,15 +1,33 @@
+import convertCase from "../node_modules/js-convert-case/lib/index";
+
 import { Casing, Extension, Size } from "./types";
 
 export const withCasing = (value: string, casing: Casing): string => {
-  if (casing === "lower") {
-    return value.toLowerCase();
-  } else if (casing === "upper") {
-    return value.toUpperCase();
-  } else if (casing === "title") {
-    return value.slice(0, 1).toUpperCase() + value.slice(1).toLowerCase();
-  } else {
-    return value;
+  const _convert = (v: string) => {
+    switch (casing) {
+      case "lower":
+        return convertCase.toLowerCase(v);
+      case "upper":
+        return convertCase.toUpperCase(v);
+      case "title":
+        return convertCase.toHeaderCase(v);
+      case 'snake':
+        return convertCase.toSnakeCase(v);
+      case 'kebab':
+        return convertCase.toKebabCase(v);
+      case 'camel':
+        return convertCase.toCamelCase(v);
+      case 'pascal':
+        return convertCase.toPascalCase(v);
+      case 'dot':
+        return convertCase.toDotCase(v);
+      default:
+        return v;
+    }
   }
+
+  const values = value.split('/').map(o => _convert(o.trim())).join(' / ');
+  return values;
 };
 
 export const buildExportSettings = (config: {
