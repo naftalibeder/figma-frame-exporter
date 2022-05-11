@@ -1,6 +1,6 @@
 export const casingStrings = ["original", "lower", "upper", "title", "snake", "kebab", "camel", "pascal", "dot"] as const;
-
 export type Casing = typeof casingStrings[number];
+
 export type Extension = "PNG" | "JPG" | "SVG" | "PDF";
 export type ConstraintType = "SCALE" | "WIDTH" | "HEIGHT";
 
