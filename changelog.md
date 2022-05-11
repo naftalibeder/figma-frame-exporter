@@ -1,3 +1,7 @@
+# 9
+
+- Added additional text formatting options, like snake, camel and kebab.
+
 # 8
 
 - Fixed bug that allowed multiple temporary frames to persist in the hierarchy
