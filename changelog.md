@@ -1,3 +1,7 @@
+# 10
+
+- Fixed extra space added to beginning of file name when exported in a directory
+
 # 9
 
 - Added additional text formatting options, like snake, camel and kebab
