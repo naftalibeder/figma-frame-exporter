@@ -17,7 +17,7 @@ const caseMap: Record<Casing, ((s: string) => string)> = {
 export const withCasing = (value: string, casing: Casing): string => {
   const values = value.split('/')
     .map(o => caseMap[casing](o.trim()))
-    .join(' / ');
+    .join('/');
   return values;
 };
 
