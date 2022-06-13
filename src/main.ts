@@ -75,7 +75,7 @@ const getExportables = (): Exportable[] => {
           size: { width: child.width, height: child.height },
         });
       }
-    } else if (node.type === 'FRAME') {
+    } else if (node.type === 'FRAME' || node.type === 'COMPONENT' || node.type === 'GROUP') {
       exportables.push({
         id: node.id,
         parentName: node.name,
