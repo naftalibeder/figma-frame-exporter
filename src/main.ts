@@ -142,7 +142,7 @@ const getAssets = async (
     const { destSize } = buildExportSettings(baseExportConfig);
     asset.size = destSize;
     const { settings } = buildExportSettings(previewSettings.isFinal ? baseExportConfig : {
-      extension: 'JPG',
+      extension: 'PNG',
       constraint: '',
       srcSize: previewSettings.thumbSize,
     });
@@ -179,7 +179,8 @@ const refreshPreview = async (config: Config | undefined) => {
       exportables,
       config,
       {
-        isFinal: false, thumbSize: { width: 32, height: 32 }
+        isFinal: false,
+        thumbSize: { width: 32, height: 32 },
       });
   }
 

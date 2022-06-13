@@ -321,11 +321,12 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    padding: 4px 0px;
   }
   .example-row-thumb {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
   }
   .example-row-filename {
     display: flex;
