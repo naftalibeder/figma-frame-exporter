@@ -1,3 +1,8 @@
+# 11
+
+- Allowed selected components and groups to be exported as well as frames
+- Improved layout of preview list
+
 # 10
 
 - Fixed extra space added to beginning of file name when exported in a directory
