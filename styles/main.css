@@ -1,0 +1,25 @@
+/* Write your global styles here, in PostCSS syntax */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-sm;
+  }
+  .scroll-box {
+    @apply flex flex-col overflow-scroll overflow-x-hidden max-h-60 mt-2 py-1 px-2;
+  }
+  .rounded-box {
+    @apply outline outline-1 outline-gray-200 rounded-sm;
+  }
+  .rounded-box.error {
+    @apply outline-red-500;
+  }
+  .section {
+    @apply flex flex-1 flex-col px-2 pt-2 pb-4;
+  }
+  .section-subtitle {
+    @apply px-2;
+  }
+}

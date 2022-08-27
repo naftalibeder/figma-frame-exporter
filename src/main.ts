@@ -1,27 +1,27 @@
 import { Exportable, Variant, Config, Asset, PreviewSettings } from "./types";
 import { withCasing, buildExportSettings, log } from "./utils";
 
-figma.showUI(__html__, { width: 340, height: 560 });
+figma.showUI(__html__, { width: 360, height: 704 });
 
 class StoredConfig {
   static get = async (): Promise<Config> => {
-    let _config = await figma.clientStorage.getAsync('config');
+    let _config = await figma.clientStorage.getAsync("config");
     if (!_config) {
       return {
         syntax: "{frame}{connector}{variant}",
-        connector: '.',
-        casing: 'original',
-        sizeConstraint: '2x',
-        extension: 'PNG',
+        connector: ".",
+        casing: "original",
+        sizeConstraint: "2x",
+        extension: "PNG",
         hideNodes: [],
-      }
+      };
     } else {
       return _config;
     }
   };
 
   static set = async (_config: Config): Promise<Config> => {
-    await figma.clientStorage.setAsync('config', _config);
+    await figma.clientStorage.setAsync("config", _config);
     return _config;
   };
 }
@@ -75,7 +75,7 @@ const getExportables = (): Exportable[] => {
           size: { width: child.width, height: child.height },
         });
       }
-    } else if (node.type === 'FRAME' || node.type === 'COMPONENT' || node.type === 'GROUP') {
+    } else if (node.type === "FRAME" || node.type === "COMPONENT" || node.type === "GROUP") {
       exportables.push({
         id: node.id,
         parentName: node.name,
@@ -91,7 +91,7 @@ const getExportables = (): Exportable[] => {
 const getAssets = async (
   exportables: readonly Exportable[],
   config: Config,
-  previewSettings: PreviewSettings,
+  previewSettings: PreviewSettings
 ): Promise<Asset[]> => {
   const { syntax, connector, casing, extension, sizeConstraint, hideNodes } = config;
 
@@ -101,10 +101,10 @@ const getAssets = async (
 
   for (const e of exportables) {
     let asset: Asset = {
-      filename: '',
+      filename: "",
       extension,
       size: undefined,
-      data: new Uint8Array,
+      data: new Uint8Array(),
     };
 
     let originalNode = figma.getNodeById(e.id) as FrameNode;
@@ -141,11 +141,15 @@ const getAssets = async (
     };
     const { destSize } = buildExportSettings(baseExportConfig);
     asset.size = destSize;
-    const { settings } = buildExportSettings(previewSettings.isFinal ? baseExportConfig : {
-      extension: 'PNG',
-      constraint: '',
-      srcSize: previewSettings.thumbSize,
-    });
+    const { settings } = buildExportSettings(
+      previewSettings.isFinal
+        ? baseExportConfig
+        : {
+            extension: "PNG",
+            constraint: "",
+            srcSize: previewSettings.thumbSize,
+          }
+    );
     try {
       asset.data = await (<ExportMixin>modifiedNode).exportAsync(settings);
     } catch (e) {
@@ -162,26 +166,23 @@ const getAssets = async (
 };
 
 const withModificationsForExport = (node: FrameNode, hideNodes: string[]): FrameNode => {
-  const nodesToHide = node.findAll(c => hideNodes.includes(c.name));
+  const nodesToHide = node.findAll((c) => hideNodes.includes(c.name));
   for (const n of nodesToHide) {
     n.visible = false;
   }
 
   return node;
-}
+};
 
 const refreshPreview = async (config: Config | undefined) => {
   const exportables = getExportables();
 
   let exampleAssets: Asset[] = [];
   if (config) {
-    exampleAssets = await getAssets(
-      exportables,
-      config,
-      {
-        isFinal: false,
-        thumbSize: { width: 32, height: 32 },
-      });
+    exampleAssets = await getAssets(exportables, config, {
+      isFinal: false,
+      thumbSize: { width: 32, height: 32 },
+    });
   }
 
   figma.ui.postMessage({
@@ -189,17 +190,13 @@ const refreshPreview = async (config: Config | undefined) => {
     preview: {
       nodeCount: exportables.length,
       exampleAssets,
-    }
+    },
   });
 };
 
 const generateExport = async (config: Config) => {
   const exportables = getExportables();
-  const assets = await getAssets(
-    exportables,
-    config,
-    { isFinal: true },
-  );
+  const assets = await getAssets(exportables, config, { isFinal: true });
   figma.ui.postMessage({
     type: "export",
     assets,
@@ -208,7 +205,7 @@ const generateExport = async (config: Config) => {
 
 figma.ui.onmessage = async (message) => {
   const type = message.type;
-  log('Message:', type);
+  log("Message:", type);
 
   if (type === "init") {
     const storedConfig = await StoredConfig.get();
@@ -228,7 +225,7 @@ figma.on("selectionchange", async () => {
   await refreshPreview(storedConfig);
 });
 
-figma.on('close', () => {
+figma.on("close", () => {
   tempFrame.remove();
-  log('closed');
+  log("closed");
 });

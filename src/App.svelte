@@ -1,64 +1,21 @@
 <script lang="ts" type="module">
+  import "../styles/main.css";
   import { onMount } from "svelte";
-  import { Button, Section, SelectMenu } from "figma-plugin-ds-svelte";
-  import convertCase from "../node_modules/js-convert-case/lib/index";
+  import { Section, Type, Input, Icon, IconForward } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
-  import {
-    Asset,
-    Casing,
-    casingStrings,
-    Config,
-    Extension,
-    Size,
-  } from "./types";
+  import { Asset, Config, NameConfig } from "./types";
+  import Divider from "./components/Divider.svelte";
+  import OutputPreview from "./components/OutputPreview.svelte";
+  import NameOptions from "./components/NameOptions.svelte";
 
-  interface CasingOption {
-    value: Casing;
-    label: string;
-    group: string | null;
-    selected: boolean;
-  }
-
-  interface ExtensionOption {
-    value: Extension;
-    label: string;
-    group: string | null;
-    selected: boolean;
-  }
-
-  let syntax: string | undefined = undefined;
-  let connector: string | undefined = undefined;
-
-  let casing: Casing | undefined = undefined;
-  let casingOptions: CasingOption[] = casingStrings.map((s) => {
-    return {
-      value: s,
-      label: convertCase.toSentenceCase(s),
-      group: null,
-      selected: false,
-    };
-  });
-
-  $: {
-    casingOptions.forEach((o, i) => {
-      casingOptions[i].selected = o.value === casing;
-    });
-  }
-
-  let sizeConstraint: string | undefined = undefined;
-
-  let extension: Extension | undefined = undefined;
-  let extensionOptions: ExtensionOption[] = [
-    { value: "PNG", label: "PNG", group: null, selected: false },
-    { value: "JPG", label: "JPG", group: null, selected: false },
-    { value: "SVG", label: "SVG", group: null, selected: false },
-    { value: "PDF", label: "PDF", group: null, selected: false },
-  ];
-  $: {
-    extensionOptions.forEach((o, i) => {
-      extensionOptions[i].selected = o.value === extension;
-    });
-  }
+  let config: Config = {
+    syntax: "",
+    connector: "",
+    casing: "camel",
+    sizeConstraint: "",
+    extension: "PNG",
+    hideNodes: [],
+  };
 
   let hideNodesStr = "";
   let hideNodes: string[] = [];
@@ -72,36 +29,12 @@
   let nodeCount = 0;
   let exampleAssets: Asset[] = [];
 
-  const displaySize = (size: Size): string => {
-    const rounded: Size = {
-      width: Math.round(size.width),
-      height: Math.round(size.height),
-    };
-    return `${rounded.width}x${rounded.height}`;
-  };
-
-  const buildConfig = (): Config => {
-    return {
-      syntax,
-      connector,
-      casing,
-      sizeConstraint,
-      extension,
-      hideNodes,
-    };
-  };
-
   window.onmessage = async (event: MessageEvent) => {
     const message = event.data.pluginMessage;
     const type = message.type;
 
     if (type === "load") {
-      const config = message.config as Config;
-      syntax = config.syntax;
-      connector = config.connector;
-      casing = config.casing;
-      sizeConstraint = config.sizeConstraint;
-      extension = config.extension;
+      config = message.config as Config;
       hideNodesStr = config.hideNodes.join(", ");
     } else if (type === "preview") {
       const preview = message.preview;
@@ -128,12 +61,22 @@
     );
   });
 
+  const onChangeNameConfig = (nameConfig: NameConfig) => {
+    config = {
+      ...nameConfig,
+      hideNodes,
+    };
+    onChangeConfig();
+  };
+
   const onChangeConfig = () => {
+    console.log("Updated config:", config);
+
     parent.postMessage(
       {
         pluginMessage: {
           type: "config",
-          config: buildConfig(),
+          config,
         },
       },
       "*"
@@ -145,7 +88,7 @@
       {
         pluginMessage: {
           type: "export",
-          config: buildConfig(),
+          config,
         },
       },
       "*"
@@ -176,195 +119,42 @@
   };
 </script>
 
-<div class="wrap">
-  <div class="row">
-    <div class="section">
-      <Section>File name</Section>
-      <input
-        type="text"
-        placeholder="Enter a syntax"
-        bind:value={syntax}
-        on:input={onChangeConfig}
-      />
-    </div>
+<div class="flex flex-1 flex-col">
+  <div class="section">
+    <NameOptions nameConfig={config} {onChangeNameConfig} />
   </div>
 
-  <div class="row">
-    <div class="section">
-      <Section>Connector</Section>
-      <input
-        type="text"
-        placeholder="Enter a connector mark"
-        bind:value={connector}
-        on:input={onChangeConfig}
-      />
+  <Divider />
+
+  <div class="section">
+    <Section>Exclude sublayers</Section>
+    <div class="section-subtitle">
+      <Type>Any layers named below, separated by commas, will be excluded from exports.</Type>
     </div>
-    <div class="section">
-      <Section>Capitalization</Section>
-      <SelectMenu
-        bind:menuItems={casingOptions}
-        on:change={(e) => {
-          casing = e.detail.value;
-          onChangeConfig();
-        }}
-      />
-    </div>
+    <Input
+      class="mt-2"
+      type="text"
+      placeholder="E.g. 'Background, Icon-Content'"
+      bind:value={hideNodesStr}
+      on:input={onChangeConfig}
+    />
   </div>
 
-  <div class="row">
-    <div class="section">
-      <Section>Size</Section>
-      <input
-        type="text"
-        placeholder="E.g. 2x, 64w, 200h"
-        disabled={!extension || extension === "SVG"}
-        bind:value={sizeConstraint}
-        on:input={onChangeConfig}
-      />
-    </div>
-    <div class="section">
-      <Section>Format</Section>
-      <SelectMenu
-        bind:menuItems={extensionOptions}
-        on:change={(e) => {
-          extension = e.detail.value;
-          onChangeConfig();
-        }}
-      />
-    </div>
+  <Divider />
+
+  <div class="section">
+    <OutputPreview {exampleAssets} />
   </div>
 
-  <div class="row">
-    <div class="section">
-      <Section>Exclude sublayers</Section>
-      <input
-        type="text"
-        placeholder="E.g. 'Background, Icon-Content'"
-        bind:value={hideNodesStr}
-        on:input={onChangeConfig}
-      />
-    </div>
-  </div>
+  <Divider />
 
-  <Section>Output</Section>
-  <div class="example">
-    {#if exampleAssets.length > 0}
-      {#each exampleAssets as exampleAsset, index}
-        {#if index > 0}
-          <hr />
-        {/if}
-        <div class="example-row">
-          <img
-            class="example-row-thumb"
-            src={exampleAsset.url}
-            alt="asset thumbnail"
-          />
-          <span class="example-row-filename">
-            {exampleAsset.filename}.{exampleAsset.extension.toLowerCase()}
-          </span>
-          {#if exampleAsset.size}
-            <span>
-              {displaySize(exampleAsset.size)}
-            </span>
-          {/if}
-        </div>
-      {/each}
-    {:else}
-      <div class="example-text-placeholder">Select at least one frame.</div>
-    {/if}
-  </div>
-
-  <div class="button-holder">
-    <Button on:click={onSelectExport} disabled={nodeCount === 0}
-      >Export {nodeCount} images</Button
-    >
+  <div
+    class={"flex flex-1 flex-row items-center justify-between px-4 pt-3 cursor-pointer " +
+      (nodeCount > 0 ? "opacity-80 hover:opacity-100" : "opacity-50 hover:opacity-60")}
+    disabled={nodeCount === 0}
+    on:click={onSelectExport}
+  >
+    <Type weight="bold">Export {nodeCount} images</Type>
+    <Icon iconName={IconForward} />
   </div>
 </div>
-
-<style>
-  .wrap {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: 8px;
-    padding: 8px;
-    font-size: small;
-  }
-  .row {
-    display: flex;
-    flex: 1;
-    flex-direction: row;
-    gap: 8px;
-  }
-  .section {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-  }
-  .button-holder {
-    margin-top: 8px;
-  }
-  .example {
-    display: flex;
-    flex-direction: column;
-    overflow-y: scroll;
-    height: 166px;
-    padding: 8px;
-    font-size: smaller;
-    border-color: rgb(235, 235, 235);
-    border-width: 1px;
-    border-style: solid;
-    border-radius: 4px;
-  }
-  .example-row {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 0px;
-  }
-  .example-row-thumb {
-    width: 16px;
-    height: 16px;
-  }
-  .example-row-filename {
-    display: flex;
-    flex: 1;
-    white-space: nowrap;
-    overflow-x: scroll;
-  }
-  .example-row-filename::-webkit-scrollbar {
-    display: none;
-  }
-  .example-text-placeholder {
-    color: rgb(138, 138, 138);
-  }
-  input {
-    font-size: smaller;
-    height: 32px;
-    padding-left: 8px;
-    border-color: rgb(235, 235, 235);
-    border-width: 1px;
-    border-style: solid;
-    border-radius: 4px;
-  }
-  input:hover {
-    border-color: rgb(219, 219, 219);
-  }
-  input:disabled {
-    color: rgb(173, 173, 173);
-  }
-  ::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
-  }
-  hr {
-    width: 100%;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    border-top: 1px rgb(235, 235, 235);
-    border-left: 0px;
-    border-right: 0px;
-  }
-</style>

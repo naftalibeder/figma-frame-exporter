@@ -1,4 +1,3 @@
-import path from "path";
 import svelte from "rollup-plugin-svelte";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
@@ -9,11 +8,9 @@ import typescript from "@rollup/plugin-typescript";
 import sveltePreprocess from "svelte-preprocess";
 import htmlBundle from "rollup-plugin-html-bundle";
 import postcss from "rollup-plugin-postcss";
-import cssnano from "cssnano";
 import childProcess from "child_process";
 
 const production = !process.env.ROLLUP_WATCH;
-const projectDir = path.resolve(__dirname);
 
 export default [
   {
@@ -28,24 +25,23 @@ export default [
         dev: !production,
         preprocess: sveltePreprocess({
           sourceMap: !production,
+          postcss: {
+            plugins: [require("tailwindcss"), require("autoprefixer")],
+          },
         }),
         compilerOptions: {
           dev: !production,
         },
       }),
+      postcss(),
       resolve({
         browser: true,
-        dedupe: (importee) =>
-          importee === "svelte" || importee.startsWith("svelte/"),
+        dedupe: (importee) => importee === "svelte" || importee.startsWith("svelte/"),
         extensions: [".svelte", ".mjs", ".js", ".json", ".node"],
       }),
       typescript(),
       commonjs(),
       svg(),
-      postcss({
-        extensions: [".css"],
-        plugins: [cssnano()],
-      }),
       htmlBundle({
         template: "src/index.html",
         target: "build/index.html",

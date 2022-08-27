@@ -2,7 +2,10 @@
   "compilerOptions": {
     "outDir": "build",
     "target": "ES2019",
-    "lib": ["ES2019", "dom"],
+    "lib": [
+      "ES2019",
+      "dom"
+    ],
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@figma",
@@ -10,7 +13,9 @@
       "./src/types"
     ],
     "paths": {
-      "*": ["./src/*"],
+      "*": [
+        "./src/*"
+      ],
     },
     "allowSyntheticDefaultImports": true
   }
