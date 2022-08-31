@@ -14,16 +14,16 @@ export type Casing = typeof casingStrings[number];
 export type Extension = "PNG" | "JPG" | "SVG" | "PDF";
 export type ConstraintType = "SCALE" | "WIDTH" | "HEIGHT";
 
+export interface Config extends NameConfig {
+  layerMods: LayerMod[];
+}
+
 export interface NameConfig {
   syntax: string;
   connector: string;
   casing: Casing;
   sizeConstraint: string;
   extension: Extension;
-}
-
-export interface Config extends NameConfig {
-  hideNodes: string[];
 }
 
 export interface CasingOption {
@@ -43,6 +43,12 @@ export interface ExtensionOption {
 export interface Size {
   width: number;
   height: number;
+}
+
+export interface LayerMod {
+  query: string;
+  property: "cornerRadius" | "visible";
+  value: any;
 }
 
 export interface Variant {

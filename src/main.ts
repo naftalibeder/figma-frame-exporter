@@ -1,28 +1,35 @@
-import { Exportable, Variant, Config, Asset, PreviewSettings } from "./types";
+import { Exportable, Variant, Config, Asset, PreviewSettings, LayerMod } from "./types";
 import { withCasing, buildExportSettings, log } from "./utils";
 
-figma.showUI(__html__, { width: 360, height: 704 });
+figma.showUI(__html__, { width: 360, height: 864 });
 
 class StoredConfig {
   static get = async (): Promise<Config> => {
-    let _config = await figma.clientStorage.getAsync("config");
-    if (!_config) {
-      return {
-        syntax: "{frame}{connector}{variant}",
-        connector: ".",
-        casing: "original",
-        sizeConstraint: "2x",
-        extension: "PNG",
-        hideNodes: [],
-      };
+    const defaultConfig: Config = {
+      syntax: "{frame}{connector}{variant}",
+      connector: ".",
+      casing: "original",
+      sizeConstraint: "2x",
+      extension: "PNG",
+      // TODO: For debugging.
+      layerMods: [
+        { query: "Mask|Color|White Background", property: "cornerRadius", value: 100 },
+        // { query: "Background", property: "visible", value: false },
+      ],
+    };
+
+    let storedConfig: Config | undefined = await figma.clientStorage.getAsync("config");
+    if (storedConfig) {
+      const mergedConfig = Object.assign(defaultConfig, storedConfig);
+      return mergedConfig;
     } else {
-      return _config;
+      return defaultConfig;
     }
   };
 
-  static set = async (_config: Config): Promise<Config> => {
-    await figma.clientStorage.setAsync("config", _config);
-    return _config;
+  static set = async (config: Config): Promise<Config> => {
+    await figma.clientStorage.setAsync("config", config);
+    return config;
   };
 }
 
@@ -93,7 +100,7 @@ const getAssets = async (
   config: Config,
   previewSettings: PreviewSettings
 ): Promise<Asset[]> => {
-  const { syntax, connector, casing, extension, sizeConstraint, hideNodes } = config;
+  const { syntax, connector, casing, extension, sizeConstraint, layerMods } = config;
 
   tempFrame.create();
 
@@ -111,7 +118,7 @@ const getAssets = async (
 
     // Modify node if needed.
     let modifiedNode = originalNode.clone();
-    modifiedNode = withModificationsForExport(modifiedNode, hideNodes);
+    modifiedNode = withModificationsForExport(modifiedNode, layerMods);
     if (tempFrame.frame) {
       tempFrame.frame.appendChild(modifiedNode);
     }
@@ -165,10 +172,18 @@ const getAssets = async (
   return assets;
 };
 
-const withModificationsForExport = (node: FrameNode, hideNodes: string[]): FrameNode => {
-  const nodesToHide = node.findAll((c) => hideNodes.includes(c.name));
-  for (const n of nodesToHide) {
-    n.visible = false;
+const withModificationsForExport = (node: FrameNode, layerMods: LayerMod[]): FrameNode => {
+  for (const layerMod of layerMods) {
+    const { query, property, value } = layerMod;
+
+    const children = node.findAll((child) => {
+      const match = query.match(child.name);
+      return match !== null;
+    });
+
+    for (const child of children) {
+      child[property] = value;
+    }
   }
 
   return node;

@@ -1,13 +1,13 @@
 <script lang="ts" type="module">
   import "../styles/main.css";
   import { onMount } from "svelte";
-  import { Section, Type, Input, Icon, IconForward } from "figma-plugin-ds-svelte";
+  import { Type, Icon, IconForward } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
   import { Asset, Config, NameConfig } from "./types";
   import Divider from "./components/Divider.svelte";
   import OutputPreview from "./components/OutputPreview.svelte";
   import NameOptions from "./components/NameOptions.svelte";
-  import ExcludeOptions from "./components/ExcludeOptions.svelte";
+  import LayerOptions from "./components/LayerOptions.svelte";
 
   let config: Config = {
     syntax: "",
@@ -15,7 +15,7 @@
     casing: "camel",
     sizeConstraint: "",
     extension: "PNG",
-    hideNodes: [],
+    layerMods: [],
   };
 
   let nodeCount = 0;
@@ -55,15 +55,7 @@
   const onChangeNameConfig = (nameConfig: NameConfig) => {
     config = {
       ...nameConfig,
-      hideNodes: config.hideNodes,
-    };
-    onChangeConfig();
-  };
-
-  const onChangeExcludeConfig = (hideNodes: string[]) => {
-    config = {
-      ...config,
-      hideNodes,
+      layerMods: config.layerMods,
     };
     onChangeConfig();
   };
@@ -126,7 +118,7 @@
   <Divider />
 
   <div class="section">
-    <ExcludeOptions hideNodes={config.hideNodes} {onChangeExcludeConfig} />
+    <LayerOptions layerMods={config.layerMods} />
   </div>
 
   <Divider />
