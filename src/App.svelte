@@ -7,6 +7,7 @@
   import Divider from "./components/Divider.svelte";
   import OutputPreview from "./components/OutputPreview.svelte";
   import NameOptions from "./components/NameOptions.svelte";
+  import ExcludeOptions from "./components/ExcludeOptions.svelte";
 
   let config: Config = {
     syntax: "",
@@ -17,15 +18,6 @@
     hideNodes: [],
   };
 
-  let hideNodesStr = "";
-  let hideNodes: string[] = [];
-  $: {
-    hideNodes = hideNodesStr
-      .split(",")
-      .map((o) => o.trim())
-      .filter((o) => o.length > 0);
-  }
-
   let nodeCount = 0;
   let exampleAssets: Asset[] = [];
 
@@ -35,7 +27,6 @@
 
     if (type === "load") {
       config = message.config as Config;
-      hideNodesStr = config.hideNodes.join(", ");
     } else if (type === "preview") {
       const preview = message.preview;
       nodeCount = preview.nodeCount;
@@ -64,6 +55,14 @@
   const onChangeNameConfig = (nameConfig: NameConfig) => {
     config = {
       ...nameConfig,
+      hideNodes: config.hideNodes,
+    };
+    onChangeConfig();
+  };
+
+  const onChangeExcludeConfig = (hideNodes: string[]) => {
+    config = {
+      ...config,
       hideNodes,
     };
     onChangeConfig();
@@ -127,17 +126,7 @@
   <Divider />
 
   <div class="section">
-    <Section>Exclude sublayers</Section>
-    <div class="section-subtitle">
-      <Type>Any layers named below, separated by commas, will be excluded from exports.</Type>
-    </div>
-    <Input
-      class="mt-2"
-      type="text"
-      placeholder="E.g. 'Background, Icon-Content'"
-      bind:value={hideNodesStr}
-      on:input={onChangeConfig}
-    />
+    <ExcludeOptions hideNodes={config.hideNodes} {onChangeExcludeConfig} />
   </div>
 
   <Divider />
