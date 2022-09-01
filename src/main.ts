@@ -11,11 +11,7 @@ class StoredConfig {
       casing: "original",
       sizeConstraint: "2x",
       extension: "PNG",
-      // TODO: For debugging.
-      layerMods: [
-        { query: "Mask|Color|White Background", property: "cornerRadius", value: 100 },
-        // { query: "Background", property: "visible", value: false },
-      ],
+      layerMods: [{ query: undefined, property: undefined, value: undefined }],
     };
 
     let storedConfig: Config | undefined = await figma.clientStorage.getAsync("config");
@@ -116,12 +112,9 @@ const getAssets = async (
 
     let originalNode = figma.getNodeById(e.id) as FrameNode;
 
-    // Modify node if needed.
-    let modifiedNode = originalNode.clone();
-    modifiedNode = withModificationsForExport(modifiedNode, layerMods);
-    if (tempFrame.frame) {
-      tempFrame.frame.appendChild(modifiedNode);
-    }
+    // Modify node or its children if specified.
+    const modifiedNode = withModificationsForExport(originalNode, layerMods);
+    tempFrame.frame?.appendChild(modifiedNode);
 
     // Build filename.
     let variantsStr = "";
@@ -173,20 +166,39 @@ const getAssets = async (
 };
 
 const withModificationsForExport = (node: FrameNode, layerMods: LayerMod[]): FrameNode => {
+  let modifiedNode = node.clone();
+
   for (const layerMod of layerMods) {
     const { query, property, value } = layerMod;
 
-    const children = node.findAll((child) => {
-      const match = query.match(child.name);
+    const matches = modifiedNode.findAll((child) => {
+      const match = child.name.match(query);
       return match !== null;
     });
 
-    for (const child of children) {
-      child[property] = value;
+    log(`Matched ${layerMod.query} to ${matches.length} layers`);
+
+    for (const match of matches) {
+      try {
+        const _type = typeof match[property];
+
+        let _value: any;
+        if (_type === "number") {
+          _value = parseFloat(value);
+        } else if (_type === "boolean") {
+          _value = value === "true";
+        } else {
+          _value = value;
+        }
+
+        match[property] = _value;
+      } catch (e) {
+        log(`Could not assign '${value}' to property '${property}' in layer '${match.name}':`, e);
+      }
     }
   }
 
-  return node;
+  return modifiedNode;
 };
 
 const refreshPreview = async (config: Config | undefined) => {

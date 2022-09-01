@@ -1,17 +1,10 @@
 <script lang="ts" type="module">
   import { Section, SelectMenu, Input } from "figma-plugin-ds-svelte";
   import convertCase from "../../node_modules/js-convert-case/lib/index";
-  import {
-    Casing,
-    CasingOption,
-    casingStrings,
-    Extension,
-    ExtensionOption,
-    NameConfig,
-  } from "types";
+  import { CasingOption, casingStrings, ExtensionOption, NameConfig } from "types";
 
   export let nameConfig: NameConfig;
-  export let onChangeNameConfig: (_nameConfig: NameConfig) => void;
+  export let onChange: (_nameConfig: NameConfig) => void;
 
   let casingOptions: CasingOption[] = casingStrings.map((s) => {
     return {
@@ -40,7 +33,7 @@
   }
 
   const _onChangeConfig = () => {
-    onChangeNameConfig(nameConfig);
+    onChange(nameConfig);
   };
 </script>
 

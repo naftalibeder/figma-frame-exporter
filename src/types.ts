@@ -46,9 +46,9 @@ export interface Size {
 }
 
 export interface LayerMod {
-  query: string;
-  property: "cornerRadius" | "visible";
-  value: any;
+  query?: string;
+  property?: "cornerRadius" | "visible";
+  value?: any;
 }
 
 export interface Variant {

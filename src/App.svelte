@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { Type, Icon, IconForward } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
-  import { Asset, Config, NameConfig } from "./types";
+  import { Asset, Config } from "./types";
   import Divider from "./components/Divider.svelte";
   import OutputPreview from "./components/OutputPreview.svelte";
   import NameOptions from "./components/NameOptions.svelte";
@@ -51,14 +51,6 @@
       "*"
     );
   });
-
-  const onChangeNameConfig = (nameConfig: NameConfig) => {
-    config = {
-      ...nameConfig,
-      layerMods: config.layerMods,
-    };
-    onChangeConfig();
-  };
 
   const onChangeConfig = () => {
     console.log("Updated config:", config);
@@ -112,13 +104,31 @@
 
 <div class="flex flex-1 flex-col">
   <div class="section">
-    <NameOptions nameConfig={config} {onChangeNameConfig} />
+    <NameOptions
+      nameConfig={config}
+      onChange={(nameConfig) => {
+        config = {
+          ...nameConfig,
+          layerMods: config.layerMods,
+        };
+        onChangeConfig();
+      }}
+    />
   </div>
 
   <Divider />
 
   <div class="section">
-    <LayerOptions layerMods={config.layerMods} />
+    <LayerOptions
+      layerMods={config.layerMods}
+      onChangeLayerMods={(layerMods) => {
+        config = {
+          ...config,
+          layerMods,
+        };
+        onChangeConfig();
+      }}
+    />
   </div>
 
   <Divider />
