@@ -171,6 +171,10 @@ const withModificationsForExport = (node: FrameNode, layerMods: LayerMod[]): Fra
   for (const layerMod of layerMods) {
     const { query, property, value } = layerMod;
 
+    if (!query || !property || !value) {
+      continue;
+    }
+
     const matches = modifiedNode.findAll((child) => {
       const match = child.name.match(query);
       return match !== null;
