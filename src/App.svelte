@@ -8,6 +8,7 @@
   import OutputPreview from "./components/OutputPreview.svelte";
   import NameOptions from "./components/NameOptions.svelte";
   import LayerOptions from "./components/LayerOptions.svelte";
+  import { log } from "utils";
 
   let config: Config = {
     syntax: "",
@@ -53,7 +54,7 @@
   });
 
   const onChangeConfig = () => {
-    console.log("Updated config:", config);
+    log("Updated config:", config);
 
     parent.postMessage(
       {

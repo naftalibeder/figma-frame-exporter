@@ -1,6 +1,23 @@
 <script lang="ts" type="module">
-  import { Type, Icon, Input, IconMinus } from "figma-plugin-ds-svelte";
-  import { LayerMod } from "types";
+  import { Type, Icon, Input, IconMinus, SelectMenu } from "figma-plugin-ds-svelte";
+  import { LayerMod, layerProperties, LayerProperty, LayerPropertyOption } from "types";
+
+  let selectedLayerProperty: LayerProperty | undefined = undefined;
+  let layerPropertyOptions: LayerPropertyOption[] = [];
+  $: {
+    const options = layerProperties.map((o) => {
+      return { value: o, label: o, group: null, selected: o === selectedLayerProperty };
+    });
+    layerPropertyOptions = [
+      {
+        value: undefined,
+        label: "Select property",
+        group: null,
+        selected: selectedLayerProperty === undefined,
+      },
+      ...options,
+    ];
+  }
 
   export let layerMod: LayerMod;
   export let onChange: (mod: LayerMod) => void;
@@ -10,11 +27,12 @@
 <div class="flex flex-row">
   <div class="flex flex-1 flex-col gap-1">
     <div class="flex flex-row items-center">
-      <div class="flex flex-shrink-0 w-[40]">
+      <div class="flex flex-shrink-0 w-[32]">
         <Type>For</Type>
       </div>
       <div class="flex flex-1 flex-row items-center gap-2">
         <Input
+          class="flex flex-1"
           type="text"
           placeholder="Layers matching..."
           bind:value={layerMod.query}
@@ -26,21 +44,22 @@
       </div>
     </div>
     <div class="flex flex-row items-center">
-      <div class="flex flex-shrink-0 w-[40]">
+      <div class="flex flex-shrink-0 w-[32]">
         <Type>Set</Type>
       </div>
       <div class="flex flex-1 flex-row items-center gap-2">
-        <Input
-          type="text"
-          placeholder="Property"
-          bind:value={layerMod.property}
-          on:input={(e) => {
-            layerMod.property = e.target["value"];
-            onChange(layerMod);
-          }}
-        />
+        <div class="grow">
+          <SelectMenu
+            bind:menuItems={layerPropertyOptions}
+            on:change={(e) => {
+              layerMod.property = e.detail.value;
+              onChange(layerMod);
+            }}
+          />
+        </div>
         <Type>to</Type>
         <Input
+          class="w-[80]"
           type="text"
           placeholder="Value"
           bind:value={layerMod.value}

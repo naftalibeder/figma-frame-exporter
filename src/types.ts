@@ -14,6 +14,29 @@ export type Casing = typeof casingStrings[number];
 export type Extension = "PNG" | "JPG" | "SVG" | "PDF";
 export type ConstraintType = "SCALE" | "WIDTH" | "HEIGHT";
 
+export const layerProperties = [
+  "visible",
+  "x",
+  "y",
+  "rotation",
+  "strokeWeight",
+  "strokeTopWeight",
+  "strokeBottomWeight",
+  "strokeLeftWeight",
+  "strokeRightWeight",
+  "cornerRadius",
+  "topLeftRadius",
+  "topRightRadius",
+  "bottomLeftRadius",
+  "bottomRightRadius",
+  "paddingLeft",
+  "paddingRight",
+  "paddingTop",
+  "paddingBottom",
+  "opacity",
+] as const;
+export type LayerProperty = typeof layerProperties[number];
+
 export interface Config extends NameConfig {
   layerMods: LayerMod[];
 }
@@ -35,6 +58,13 @@ export interface CasingOption {
 
 export interface ExtensionOption {
   value: Extension;
+  label: string;
+  group: string | null;
+  selected: boolean;
+}
+
+export interface LayerPropertyOption {
+  value: LayerProperty;
   label: string;
   group: string | null;
   selected: boolean;
