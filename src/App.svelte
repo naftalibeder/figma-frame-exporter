@@ -7,7 +7,7 @@
   import Divider from "./components/Divider.svelte";
   import OutputPreview from "./components/OutputPreview.svelte";
   import NameOptions from "./components/NameOptions.svelte";
-  import LayerOptions from "./components/LayerOptions.svelte";
+  import LayerModList from "./components/LayerModList.svelte";
   import { log } from "utils";
 
   let config: Config = {
@@ -120,7 +120,7 @@
   <Divider />
 
   <div class="section">
-    <LayerOptions
+    <LayerModList
       layerMods={config.layerMods}
       onChangeLayerMods={(layerMods) => {
         config = {

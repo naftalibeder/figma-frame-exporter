@@ -2,7 +2,7 @@
   import { Type, Section, Icon, IconPlus } from "figma-plugin-ds-svelte";
   import { LayerMod } from "types";
   import Divider from "./Divider.svelte";
-  import LayerOptionItem from "./LayerOptionItem.svelte";
+  import LayerModItem from "./LayerModItem.svelte";
 
   export let layerMods: LayerMod[];
   export let onChangeLayerMods: (mods: LayerMod[]) => void;
@@ -35,7 +35,7 @@
         <Divider />
       {/if}
 
-      <LayerOptionItem
+      <LayerModItem
         layerMod={layerMods[index]}
         onChange={(mod) => {
           const mods = [...layerMods];
