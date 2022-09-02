@@ -64,6 +64,7 @@ export interface Size {
 }
 
 export interface LayerMod {
+  id: string;
   query?: string;
   property?: "cornerRadius" | "visible";
   value?: any;
@@ -92,6 +93,14 @@ export interface Asset {
 export interface PreviewSettings {
   isFinal: boolean;
   thumbSize?: Size;
+}
+
+export type LayerModMatches = Record<string, number>;
+
+export interface ExportPayload {
+  nodeCount: number;
+  layerModMatches: LayerModMatches;
+  assets: Asset[];
 }
 
 export default {};

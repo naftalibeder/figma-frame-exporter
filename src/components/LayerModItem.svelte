@@ -2,7 +2,16 @@
   import { Type, Icon, Input, IconMinus, SelectMenu } from "figma-plugin-ds-svelte";
   import { LayerMod, layerProperties, LayerProperty, LayerPropertyOption } from "types";
 
+  export let layerMod: LayerMod;
+  export let matchedNodeCount: number;
+  export let onChange: (mod: LayerMod) => void;
+  export let onSelectDelete: () => void;
+
   let selectedLayerProperty: LayerProperty | undefined = undefined;
+  $: {
+    selectedLayerProperty = layerMod.property;
+  }
+
   let layerPropertyOptions: LayerPropertyOption[] = [];
   $: {
     const options = layerProperties.map((o) => {
@@ -18,10 +27,6 @@
       ...options,
     ];
   }
-
-  export let layerMod: LayerMod;
-  export let onChange: (mod: LayerMod) => void;
-  export let onSelectDelete: () => void;
 </script>
 
 <div class="flex flex-row">
@@ -30,7 +35,7 @@
       <div class="flex flex-shrink-0 w-[32]">
         <Type>For</Type>
       </div>
-      <div class="flex flex-1 flex-row items-center gap-2">
+      <div class="flex flex-1 relative">
         <Input
           class="flex flex-1"
           type="text"
@@ -41,6 +46,11 @@
             onChange(layerMod);
           }}
         />
+        <div class="flex flex-1 absolute h-full right-2">
+          <div class="flex self-center opacity-40">
+            <Type>{matchedNodeCount} matches</Type>
+          </div>
+        </div>
       </div>
     </div>
     <div class="flex flex-row items-center">

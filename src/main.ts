@@ -1,4 +1,13 @@
-import { Exportable, Variant, Config, Asset, PreviewSettings, LayerMod } from "./types";
+import {
+  Exportable,
+  Variant,
+  Config,
+  Asset,
+  PreviewSettings,
+  LayerMod,
+  ExportPayload,
+  LayerModMatches,
+} from "./types";
 import { withCasing, buildExportSettings, log } from "./utils";
 
 figma.showUI(__html__, { width: 360, height: 864 });
@@ -11,7 +20,9 @@ class StoredConfig {
       casing: "original",
       sizeConstraint: "2x",
       extension: "PNG",
-      layerMods: [{ query: undefined, property: undefined, value: undefined }],
+      layerMods: [
+        { id: `${Math.random()}`, query: undefined, property: undefined, value: undefined },
+      ],
     };
 
     let storedConfig: Config | undefined = await figma.clientStorage.getAsync("config");
@@ -91,30 +102,40 @@ const getExportables = (): Exportable[] => {
   return exportables;
 };
 
-const getAssets = async (
+const getExportPayload = async (
   exportables: readonly Exportable[],
   config: Config,
   previewSettings: PreviewSettings
-): Promise<Asset[]> => {
+): Promise<ExportPayload> => {
   const { syntax, connector, casing, extension, sizeConstraint, layerMods } = config;
 
   tempFrame.create();
 
+  let layerModMatches: LayerModMatches = {};
+  for (const layerMod of layerMods) {
+    layerModMatches[layerMod.id] = 0;
+  }
+
   let assets: Asset[] = [];
 
   for (const e of exportables) {
-    let asset: Asset = {
+    const asset: Asset = {
       filename: "",
       extension,
       size: undefined,
       data: new Uint8Array(),
     };
 
-    let originalNode = figma.getNodeById(e.id) as FrameNode;
+    let node = (figma.getNodeById(e.id) as FrameNode).clone();
 
-    // Modify node or its children if specified.
-    const modifiedNode = withModificationsForExport(originalNode, layerMods);
-    tempFrame.frame?.appendChild(modifiedNode);
+    // Modify node or its children if matched by a layer mod's query.
+    for (const layerMod of layerMods) {
+      const { node: modifiedNode, matchedNodeCount } = withLayerMods(node, layerMod);
+      node = modifiedNode;
+      tempFrame.frame?.appendChild(node);
+
+      layerModMatches[layerMod.id] += matchedNodeCount;
+    }
 
     // Build filename.
     let variantsStr = "";
@@ -151,7 +172,7 @@ const getAssets = async (
           }
     );
     try {
-      asset.data = await (<ExportMixin>modifiedNode).exportAsync(settings);
+      asset.data = await (<ExportMixin>node).exportAsync(settings);
     } catch (e) {
       log(e);
       continue;
@@ -162,75 +183,77 @@ const getAssets = async (
 
   tempFrame.remove();
 
-  return assets;
+  return { nodeCount: exportables.length, layerModMatches, assets };
 };
 
-const withModificationsForExport = (node: FrameNode, layerMods: LayerMod[]): FrameNode => {
-  let modifiedNode = node.clone();
+const withLayerMods = (
+  node: FrameNode,
+  layerMod: LayerMod
+): { node: FrameNode; matchedNodeCount: number } => {
+  const query = layerMod.query.trim();
+  const { property, value } = layerMod;
 
-  for (const layerMod of layerMods) {
-    const { query, property, value } = layerMod;
+  let matchedNodes: SceneNode[] = [];
+  if (query?.length > 0) {
+    matchedNodes = node.findAll((o) => o.name.match(query) !== null);
+  }
 
-    if (!query || !property || !value) {
-      continue;
-    }
+  log(`Matched ${layerMod.query} to ${matchedNodes.length} layers`);
 
-    const matches = modifiedNode.findAll((child) => {
-      const match = child.name.match(query);
-      return match !== null;
-    });
+  if (!property || !value) {
+    return { node, matchedNodeCount: matchedNodes.length };
+  }
 
-    log(`Matched ${layerMod.query} to ${matches.length} layers`);
+  for (const n of matchedNodes) {
+    try {
+      const _type = typeof n[property];
 
-    for (const match of matches) {
-      try {
-        const _type = typeof match[property];
-
-        let _value: any;
-        if (_type === "number") {
-          _value = parseFloat(value);
-        } else if (_type === "boolean") {
-          _value = value === "true";
-        } else {
-          _value = value;
-        }
-
-        match[property] = _value;
-      } catch (e) {
-        log(`Could not assign '${value}' to property '${property}' in layer '${match.name}':`, e);
+      let _value: any;
+      if (_type === "number") {
+        _value = parseFloat(value);
+      } else if (_type === "boolean") {
+        _value = value === "true";
+      } else {
+        _value = value;
       }
+
+      n[property] = _value;
+    } catch (e) {
+      log(`Could not assign '${value}' to property '${property}' in layer '${n.name}':`, e);
     }
   }
 
-  return modifiedNode;
+  return { node, matchedNodeCount: matchedNodes.length };
 };
 
 const refreshPreview = async (config: Config | undefined) => {
   const exportables = getExportables();
+  let exportPayload: ExportPayload | undefined;
 
-  let exampleAssets: Asset[] = [];
   if (config) {
-    exampleAssets = await getAssets(exportables, config, {
+    exportPayload = await getExportPayload(exportables, config, {
       isFinal: false,
       thumbSize: { width: 32, height: 32 },
     });
   }
 
+  if (!exportPayload) {
+    return;
+  }
+
   figma.ui.postMessage({
     type: "preview",
-    preview: {
-      nodeCount: exportables.length,
-      exampleAssets,
-    },
+    exportPayload,
   });
 };
 
 const generateExport = async (config: Config) => {
   const exportables = getExportables();
-  const assets = await getAssets(exportables, config, { isFinal: true });
+  const exportPayload = await getExportPayload(exportables, config, { isFinal: true });
+
   figma.ui.postMessage({
     type: "export",
-    assets,
+    exportPayload,
   });
 };
 

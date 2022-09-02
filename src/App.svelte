@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { Type, Icon, IconForward } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
-  import { Asset, Config } from "./types";
+  import { Asset, Config, ExportPayload, LayerModMatches } from "./types";
   import Divider from "./components/Divider.svelte";
   import OutputPreview from "./components/OutputPreview.svelte";
   import NameOptions from "./components/NameOptions.svelte";
@@ -18,8 +18,8 @@
     extension: "PNG",
     layerMods: [],
   };
-
   let nodeCount = 0;
+  let layerModMatches: LayerModMatches = {};
   let exampleAssets: Asset[] = [];
 
   window.onmessage = async (event: MessageEvent) => {
@@ -29,16 +29,13 @@
     if (type === "load") {
       config = message.config as Config;
     } else if (type === "preview") {
-      const preview = message.preview;
-      nodeCount = preview.nodeCount;
-      exampleAssets = preview.exampleAssets;
-      exampleAssets = await buildPreviewImages(exampleAssets);
+      const exportPayload = message.exportPayload as ExportPayload;
+      nodeCount = exportPayload.nodeCount;
+      layerModMatches = exportPayload.layerModMatches;
+      exampleAssets = await buildPreviewImages(exportPayload.assets);
     } else if (type === "export") {
-      const url = await buildZipArchive(message.assets);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "Export.zip";
-      link.click();
+      const exportPayload = message.exportPayload as ExportPayload;
+      await presentDownloadableArchive(exportPayload.assets);
     }
   };
 
@@ -88,7 +85,7 @@
     return assets;
   };
 
-  const buildZipArchive = async (assets: Asset[]): Promise<string> => {
+  const presentDownloadableArchive = async (assets: Asset[]) => {
     let zip = new JSZip();
 
     assets.forEach((asset) => {
@@ -99,7 +96,11 @@
 
     const blob = await zip.generateAsync({ type: "blob" });
     const url = window.URL.createObjectURL(blob);
-    return url;
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "Export.zip";
+    link.click();
   };
 </script>
 
@@ -122,6 +123,7 @@
   <div class="section">
     <LayerModList
       layerMods={config.layerMods}
+      {layerModMatches}
       onChangeLayerMods={(layerMods) => {
         config = {
           ...config,

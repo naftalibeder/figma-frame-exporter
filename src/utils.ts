@@ -2,7 +2,9 @@ import convertCase from "../node_modules/js-convert-case/lib/index";
 
 import { Casing, Extension, Size } from "./types";
 
-const caseMap: Record<Casing, ((s: string) => string)> = {
+export const randomId = () => `${Math.floor(Math.random() * 1000)}`;
+
+const caseMap: Record<Casing, (s: string) => string> = {
   original: (s) => s,
   lower: convertCase.toLowerCase,
   upper: convertCase.toUpperCase,
@@ -15,22 +17,19 @@ const caseMap: Record<Casing, ((s: string) => string)> = {
 };
 
 export const withCasing = (value: string, casing: Casing): string => {
-  const values = value.split('/')
-    .map(o => caseMap[casing](o.trim()))
-    .join('/');
+  const values = value
+    .split("/")
+    .map((o) => caseMap[casing](o.trim()))
+    .join("/");
   return values;
 };
 
 export const buildExportSettings = (config: {
-  extension: Extension,
-  constraint: string,
-  srcSize: Size
+  extension: Extension;
+  constraint: string;
+  srcSize: Size;
 }): { settings: ExportSettings; destSize?: Size } => {
-  const {
-    extension,
-    constraint,
-    srcSize,
-  } = config;
+  const { extension, constraint, srcSize } = config;
 
   if (extension === "SVG" || extension === "PDF") {
     return {
@@ -87,7 +86,7 @@ export const buildExportSettings = (config: {
 };
 
 export const log = (...args: any[]) => {
-  console.log('[Frame Exporter]', ...args);
+  console.log("[Frame Exporter]", ...args);
 };
 
 export default {};

@@ -18,7 +18,7 @@
 <div>
   <Section>Output</Section>
   <div class="section-subtitle">
-    <Type>Examples of output images will appear below.</Type>
+    <Type>Examples of output image files will appear below.</Type>
   </div>
   <div class="scroll-box rounded-box h-[206]">
     {#if exampleAssets.length > 0}

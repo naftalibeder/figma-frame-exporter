@@ -1,10 +1,12 @@
 <script lang="ts" type="module">
   import { Type, Section, Icon, IconPlus } from "figma-plugin-ds-svelte";
-  import { LayerMod } from "types";
+  import { LayerMod, LayerModMatches } from "types";
+  import { log, randomId } from "utils";
   import Divider from "./Divider.svelte";
   import LayerModItem from "./LayerModItem.svelte";
 
   export let layerMods: LayerMod[];
+  export let layerModMatches: LayerModMatches;
   export let onChangeLayerMods: (mods: LayerMod[]) => void;
 </script>
 
@@ -20,7 +22,7 @@
       class="flex items-start"
       on:click={() => {
         const mods = [...layerMods];
-        mods.push({});
+        mods.push({ id: randomId() });
         onChangeLayerMods(mods);
       }}
     >
@@ -30,13 +32,14 @@
     </div>
   </div>
   <div class="scroll-box rounded-box gap-2 h-[206] mt-2 py-2">
-    {#each layerMods as _, index}
+    {#each layerMods as layerMod, index}
       {#if index > 0}
         <Divider />
       {/if}
 
       <LayerModItem
-        layerMod={layerMods[index]}
+        {layerMod}
+        matchedNodeCount={layerModMatches[layerMod.id]}
         onChange={(mod) => {
           const mods = [...layerMods];
           mods[index] = mod;
