@@ -195,7 +195,15 @@ const withLayerMods = (
 
   let matchedNodes: SceneNode[] = [];
   if (query?.length > 0) {
-    matchedNodes = node.findAll((o) => o.name.match(query) !== null);
+    matchedNodes = node.findAll((o) => {
+      try {
+        const m = o.name.match(query) !== null;
+        return m;
+      } catch (e) {
+        log(`Cannot match '${o.name}' to '${query}': ${e}`);
+        return false;
+      }
+    });
   }
 
   log(`Matched ${layerMod.query} to ${matchedNodes.length} layers`);
