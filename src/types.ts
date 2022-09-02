@@ -16,24 +16,12 @@ export type ConstraintType = "SCALE" | "WIDTH" | "HEIGHT";
 
 export const layerProperties = [
   "visible",
+  "opacity",
   "x",
   "y",
   "rotation",
-  "strokeWeight",
-  "strokeTopWeight",
-  "strokeBottomWeight",
-  "strokeLeftWeight",
-  "strokeRightWeight",
   "cornerRadius",
-  "topLeftRadius",
-  "topRightRadius",
-  "bottomLeftRadius",
-  "bottomRightRadius",
-  "paddingLeft",
-  "paddingRight",
-  "paddingTop",
-  "paddingBottom",
-  "opacity",
+  "strokeWeight",
 ] as const;
 export type LayerProperty = typeof layerProperties[number];
 
