@@ -48,7 +48,7 @@
         />
         <div class="flex flex-1 absolute h-full right-2">
           <div class="flex self-center opacity-40">
-            <Type>{matchedNodeCount} matches</Type>
+            <Type>{matchedNodeCount} {matchedNodeCount === 1 ? "match" : "matches"}</Type>
           </div>
         </div>
       </div>

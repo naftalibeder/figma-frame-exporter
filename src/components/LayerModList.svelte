@@ -15,7 +15,12 @@
     <div class="flex flex-col">
       <Section>Modify layers</Section>
       <div class="section-subtitle">
-        <Type>Modify the exported version of any layer.</Type>
+        <Type
+          >Modify the exported version of any layer. <a
+            href="https://regex101.com/r/S9wWyf/1"
+            target="_blank">Regular expressions</a
+          > are permitted.</Type
+        >
       </div>
     </div>
     <div
