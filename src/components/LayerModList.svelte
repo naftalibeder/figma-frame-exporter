@@ -44,7 +44,7 @@
 
       <LayerModItem
         {layerMod}
-        matchedNodeCount={layerModMatches[layerMod.id]}
+        matchedNodeCount={layerModMatches[layerMod.id] ?? 0}
         onChange={(mod) => {
           const mods = [...layerMods];
           mods[index] = mod;

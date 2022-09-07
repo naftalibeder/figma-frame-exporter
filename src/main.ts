@@ -15,8 +15,8 @@ figma.showUI(__html__, { width: 360, height: 864 });
 class StoredConfig {
   static get = async (): Promise<Config> => {
     const defaultConfig: Config = {
-      syntax: "{frame}{connector}{variant}",
-      connector: ".",
+      syntax: "$F-$V",
+      connector: "-",
       casing: "original",
       sizeConstraint: "2x",
       extension: "PNG",
@@ -111,6 +111,8 @@ const getExportPayload = async (
 
   tempFrame.create();
 
+  let hasVariants = false;
+
   let layerModMatches: LayerModMatches = {};
   for (const layerMod of layerMods) {
     layerModMatches[layerMod.id] = 0;
@@ -137,7 +139,7 @@ const getExportPayload = async (
       layerModMatches[layerMod.id] += matchedNodeCount;
     }
 
-    // Build filename.
+    // Build concatenated variants part of filename.
     let variantsStr = "";
     e.variants.forEach((variant, i) => {
       const value = withCasing(variant.value, casing);
@@ -147,11 +149,14 @@ const getExportPayload = async (
         variantsStr += value;
       }
     });
-    const hasVariants = variantsStr.length > 0;
+    if (variantsStr.length > 0) {
+      hasVariants = true;
+    }
+
+    // Build full filename.
     const filename = syntax
-      .replace("{frame}", withCasing(e.parentName, casing))
-      .replace("{connector}", hasVariants ? connector : "")
-      .replace("{variant}", variantsStr);
+      .replace("$F", withCasing(e.parentName, casing))
+      .replace("$V", variantsStr);
     asset.filename = filename;
 
     // Generate image data.
@@ -183,14 +188,14 @@ const getExportPayload = async (
 
   tempFrame.remove();
 
-  return { nodeCount: exportables.length, layerModMatches, assets };
+  return { nodeCount: exportables.length, hasVariants, layerModMatches, assets };
 };
 
 const withLayerMods = (
   node: FrameNode,
   layerMod: LayerMod
 ): { node: FrameNode; matchedNodeCount: number } => {
-  const query = layerMod.query.trim();
+  const query = layerMod.query?.trim() ?? "";
   const { property, value } = layerMod;
 
   let matchedNodes: SceneNode[] = [];
@@ -236,8 +241,10 @@ const withLayerMods = (
 
 const refreshPreview = async (config: Config | undefined) => {
   const exportables = getExportables();
-  let exportPayload: ExportPayload | undefined;
 
+  log("Exportables:", exportables);
+
+  let exportPayload: ExportPayload | undefined;
   if (config) {
     exportPayload = await getExportPayload(exportables, config, {
       isFinal: false,

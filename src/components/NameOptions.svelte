@@ -4,6 +4,7 @@
   import { CasingOption, casingStrings, ExtensionOption, NameConfig } from "types";
 
   export let nameConfig: NameConfig;
+  export let hasVariants: boolean;
   export let onChange: (_nameConfig: NameConfig) => void;
 
   let casingOptions: CasingOption[] = casingStrings.map((s) => {
@@ -53,19 +54,7 @@
 
   <div class="flex flex-row gap-2">
     <div class="flex flex-1 flex-col">
-      <Section>Connector</Section>
-      <Input
-        type="text"
-        placeholder="Enter a connector mark"
-        bind:value={nameConfig.connector}
-        on:input={(e) => {
-          nameConfig.connector = e.target["value"];
-          _onChangeConfig();
-        }}
-      />
-    </div>
-    <div class="flex flex-1 flex-col">
-      <Section>Capitalization</Section>
+      <Section>Variable format</Section>
       <SelectMenu
         bind:menuItems={casingOptions}
         on:change={(e) => {
@@ -74,11 +63,24 @@
         }}
       />
     </div>
+    <div class="flex flex-1 flex-col">
+      <Section>Variant connector</Section>
+      <Input
+        type="text"
+        placeholder="Text that connects variants"
+        disabled={!hasVariants}
+        bind:value={nameConfig.connector}
+        on:input={(e) => {
+          nameConfig.connector = e.target["value"];
+          _onChangeConfig();
+        }}
+      />
+    </div>
   </div>
 
   <div class="flex flex-row gap-2">
     <div class="flex flex-1 flex-col">
-      <Section>Size</Section>
+      <Section>Image size</Section>
       <Input
         type="text"
         placeholder="E.g. 2x, 64w, 200h"
@@ -91,7 +93,7 @@
       />
     </div>
     <div class="flex flex-1 flex-col">
-      <Section>Format</Section>
+      <Section>File type</Section>
       <SelectMenu
         bind:menuItems={extensionOptions}
         on:change={(e) => {

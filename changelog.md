@@ -1,3 +1,9 @@
+# 12
+
+- Created flow for applying non-destructive modifications to layers before export
+- Updated method of specifying filenames
+- Overhauled visual style
+
 # 11
 
 - Allowed selected components and groups to be exported as well as frames

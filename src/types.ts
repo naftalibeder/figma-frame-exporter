@@ -99,6 +99,7 @@ export type LayerModMatches = Record<string, number>;
 
 export interface ExportPayload {
   nodeCount: number;
+  hasVariants: boolean;
   layerModMatches: LayerModMatches;
   assets: Asset[];
 }

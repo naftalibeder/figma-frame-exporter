@@ -19,6 +19,7 @@
     layerMods: [],
   };
   let nodeCount = 0;
+  let hasVariants = false;
   let layerModMatches: LayerModMatches = {};
   let exampleAssets: Asset[] = [];
 
@@ -31,6 +32,7 @@
     } else if (type === "preview") {
       const exportPayload = message.exportPayload as ExportPayload;
       nodeCount = exportPayload.nodeCount;
+      hasVariants = exportPayload.hasVariants;
       layerModMatches = exportPayload.layerModMatches;
       exampleAssets = await buildPreviewImages(exportPayload.assets);
     } else if (type === "export") {
@@ -108,6 +110,7 @@
   <div class="section">
     <NameOptions
       nameConfig={config}
+      {hasVariants}
       onChange={(nameConfig) => {
         config = {
           ...nameConfig,
