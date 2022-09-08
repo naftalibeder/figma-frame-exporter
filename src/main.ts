@@ -15,7 +15,7 @@ figma.showUI(__html__, { width: 360, height: 907 });
 class StoredConfig {
   static get = async (): Promise<Config> => {
     const defaultConfig: Config = {
-      syntax: "$F-$V",
+      syntax: "$F$V",
       connectors: {
         before: "",
         between: "",
@@ -29,7 +29,7 @@ class StoredConfig {
       ],
     };
 
-    let storedConfig: Config | undefined = await figma.clientStorage.getAsync("config");
+    let storedConfig: Config | undefined = await figma.clientStorage.getAsync("store");
     if (storedConfig) {
       const mergedConfig = Object.assign(defaultConfig, storedConfig);
       return mergedConfig;
