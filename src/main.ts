@@ -10,7 +10,7 @@ import {
 } from "./types";
 import { withCasing, buildExportSettings, log } from "./utils";
 
-figma.showUI(__html__, { width: 360, height: 877 });
+figma.showUI(__html__, { width: 360, height: 907 });
 
 class StoredConfig {
   static get = async (): Promise<Config> => {
