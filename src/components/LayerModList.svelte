@@ -13,13 +13,13 @@
 <div>
   <div class="flex flex-row gap-2 justify-between">
     <div class="flex flex-col">
-      <Section>Modify layers</Section>
+      <Section>Layer modifiers</Section>
       <div class="section-subtitle">
         <Type
-          >Modify the exported version of any layer. <a
+          >Modify the exported version of any layer. Match text is evaluated as a <a
             href="https://regex101.com/r/S9wWyf/1"
-            target="_blank">Regular expressions</a
-          > are permitted.</Type
+            target="_blank">regular expression</a
+          >.</Type
         >
       </div>
     </div>

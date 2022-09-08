@@ -1,7 +1,7 @@
 <script lang="ts" type="module">
   import { Section, SelectMenu, Input } from "figma-plugin-ds-svelte";
   import convertCase from "../../node_modules/js-convert-case/lib/index";
-  import { CasingOption, casingStrings, ExtensionOption, NameConfig } from "types";
+  import { CasingOption, casingStrings, NameConfig } from "types";
 
   export let nameConfig: NameConfig;
   export let hasVariants: boolean;
@@ -18,18 +18,6 @@
   $: {
     casingOptions.forEach((o, i) => {
       casingOptions[i].selected = o.value === nameConfig.casing;
-    });
-  }
-
-  let extensionOptions: ExtensionOption[] = [
-    { value: "PNG", label: "PNG", group: null, selected: false },
-    { value: "JPG", label: "JPG", group: null, selected: false },
-    { value: "SVG", label: "SVG", group: null, selected: false },
-    { value: "PDF", label: "PDF", group: null, selected: false },
-  ];
-  $: {
-    extensionOptions.forEach((o, i) => {
-      extensionOptions[i].selected = o.value === nameConfig.extension;
     });
   }
 
@@ -54,7 +42,7 @@
 
   <div class="flex flex-row gap-2">
     <div class="flex flex-1 flex-col">
-      <Section>Variable format</Section>
+      <Section>Frame name format</Section>
       <SelectMenu
         bind:menuItems={casingOptions}
         on:change={(e) => {
@@ -64,43 +52,39 @@
       />
     </div>
     <div class="flex flex-1 flex-col">
-      <Section>Variant connector</Section>
-      <Input
-        type="text"
-        placeholder="Text that connects variants"
-        disabled={!hasVariants}
-        bind:value={nameConfig.connector}
-        on:input={(e) => {
-          nameConfig.connector = e.target["value"];
-          _onChangeConfig();
-        }}
-      />
-    </div>
-  </div>
-
-  <div class="flex flex-row gap-2">
-    <div class="flex flex-1 flex-col">
-      <Section>Image size</Section>
-      <Input
-        type="text"
-        placeholder="E.g. 2x, 64w, 200h"
-        disabled={!nameConfig.extension || nameConfig.extension === "SVG"}
-        bind:value={nameConfig.sizeConstraint}
-        on:input={(e) => {
-          nameConfig.sizeConstraint = e.target["value"];
-          _onChangeConfig();
-        }}
-      />
-    </div>
-    <div class="flex flex-1 flex-col">
-      <Section>File type</Section>
-      <SelectMenu
-        bind:menuItems={extensionOptions}
-        on:change={(e) => {
-          nameConfig.extension = e.detail.value;
-          _onChangeConfig();
-        }}
-      />
+      <Section>Variants connector</Section>
+      <div class="flex flex-1 flex-row">
+        <Input
+          type="text"
+          placeholder="Before"
+          disabled={!hasVariants}
+          bind:value={nameConfig.connectors.before}
+          on:input={(e) => {
+            nameConfig.connectors.before = e.target["value"];
+            _onChangeConfig();
+          }}
+        />
+        <Input
+          type="text"
+          placeholder="Between"
+          disabled={!hasVariants}
+          bind:value={nameConfig.connectors.between}
+          on:input={(e) => {
+            nameConfig.connectors.between = e.target["value"];
+            _onChangeConfig();
+          }}
+        />
+        <Input
+          type="text"
+          placeholder="After"
+          disabled={!hasVariants}
+          bind:value={nameConfig.connectors.after}
+          on:input={(e) => {
+            nameConfig.connectors.after = e.target["value"];
+            _onChangeConfig();
+          }}
+        />
+      </div>
     </div>
   </div>
 </div>

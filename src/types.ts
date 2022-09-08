@@ -1,3 +1,9 @@
+export type Connectors = {
+  before: string;
+  between: string;
+  after: string;
+};
+
 export const casingStrings = [
   "original",
   "lower",
@@ -25,14 +31,17 @@ export const layerProperties = [
 ] as const;
 export type LayerProperty = typeof layerProperties[number];
 
-export interface Config extends NameConfig {
+export interface Config extends NameConfig, ImageConfig {
   layerMods: LayerMod[];
 }
 
 export interface NameConfig {
   syntax: string;
-  connector: string;
+  connectors: Connectors;
   casing: Casing;
+}
+
+export interface ImageConfig {
   sizeConstraint: string;
   extension: Extension;
 }

@@ -16,7 +16,7 @@
 </script>
 
 <div>
-  <Section>Output</Section>
+  <Section>Preview</Section>
   <div class="section-subtitle">
     <Type>Examples of output image files will appear below.</Type>
   </div>

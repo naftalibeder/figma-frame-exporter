@@ -3,16 +3,21 @@
   import { onMount } from "svelte";
   import { Type, Icon, IconForward } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
+  import { log } from "utils";
   import { Asset, Config, ExportPayload, LayerModMatches } from "./types";
   import Divider from "./components/Divider.svelte";
   import OutputPreview from "./components/OutputPreview.svelte";
   import NameOptions from "./components/NameOptions.svelte";
   import LayerModList from "./components/LayerModList.svelte";
-  import { log } from "utils";
+  import ImageOptions from "./components/ImageOptions.svelte";
 
   let config: Config = {
     syntax: "",
-    connector: "",
+    connectors: {
+      before: "",
+      between: "",
+      after: "",
+    },
     casing: "camel",
     sizeConstraint: "",
     extension: "PNG",
@@ -113,8 +118,8 @@
       {hasVariants}
       onChange={(nameConfig) => {
         config = {
+          ...config,
           ...nameConfig,
-          layerMods: config.layerMods,
         };
         onChangeConfig();
       }}
@@ -139,6 +144,20 @@
 
   <Divider />
 
+  <div class="section">
+    <ImageOptions
+      imageConfig={config}
+      onChange={(imageConfig) => {
+        config = {
+          ...config,
+          ...imageConfig,
+        };
+        onChangeConfig();
+      }}
+    />
+  </div>
+
+  <Divider />
   <div class="section">
     <OutputPreview {exampleAssets} />
   </div>

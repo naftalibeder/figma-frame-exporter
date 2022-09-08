@@ -10,13 +10,17 @@ import {
 } from "./types";
 import { withCasing, buildExportSettings, log } from "./utils";
 
-figma.showUI(__html__, { width: 360, height: 864 });
+figma.showUI(__html__, { width: 360, height: 877 });
 
 class StoredConfig {
   static get = async (): Promise<Config> => {
     const defaultConfig: Config = {
       syntax: "$F-$V",
-      connector: "-",
+      connectors: {
+        before: "",
+        between: "",
+        after: "",
+      },
       casing: "original",
       sizeConstraint: "2x",
       extension: "PNG",
@@ -107,7 +111,7 @@ const getExportPayload = async (
   config: Config,
   previewSettings: PreviewSettings
 ): Promise<ExportPayload> => {
-  const { syntax, connector, casing, extension, sizeConstraint, layerMods } = config;
+  const { syntax, connectors, casing, extension, sizeConstraint, layerMods } = config;
 
   tempFrame.create();
 
@@ -144,13 +148,19 @@ const getExportPayload = async (
     e.variants.forEach((variant, i) => {
       const value = withCasing(variant.value, casing);
       if (i > 0) {
-        variantsStr += `${connector}${value}`;
+        variantsStr += `${connectors.between}${value}`;
       } else {
         variantsStr += value;
       }
     });
     if (variantsStr.length > 0) {
       hasVariants = true;
+    }
+    if (connectors.before.length > 0) {
+      variantsStr = connectors.before + variantsStr;
+    }
+    if (connectors.after.length > 0) {
+      variantsStr = variantsStr + connectors.after;
     }
 
     // Build full filename.

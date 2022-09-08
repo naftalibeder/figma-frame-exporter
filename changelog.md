@@ -1,7 +1,7 @@
 # 12
 
 - Created flow for applying non-destructive modifications to layers before export
-- Updated method of specifying filenames
+- Updated method of specifying filenames to allow more specificity
 - Overhauled visual style
 
 # 11
