@@ -12,6 +12,10 @@ import { withCasing, buildExportSettings, log } from "./utils";
 
 figma.showUI(__html__, { width: 360, height: 907 });
 
+const STORE_NAME = "store";
+
+let previewTimer: number | undefined;
+
 class StoredConfig {
   static get = async (): Promise<Config> => {
     const defaultConfig: Config = {
@@ -29,7 +33,7 @@ class StoredConfig {
       ],
     };
 
-    let storedConfig: Config | undefined = await figma.clientStorage.getAsync("store");
+    let storedConfig: Config | undefined = await figma.clientStorage.getAsync(STORE_NAME);
     if (storedConfig) {
       const mergedConfig = Object.assign(defaultConfig, storedConfig);
       return mergedConfig;
@@ -39,7 +43,7 @@ class StoredConfig {
   };
 
   static set = async (config: Config): Promise<Config> => {
-    await figma.clientStorage.setAsync("config", config);
+    await figma.clientStorage.setAsync(STORE_NAME, config);
     return config;
   };
 }
@@ -249,8 +253,13 @@ const withLayerMods = (
   return { node, matchedNodeCount: matchedNodes.length };
 };
 
-const refreshPreview = async (config: Config | undefined) => {
-  const exportables = getExportables();
+const refreshPreviewDebounced = (config: Config | undefined) => {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(() => refreshPreview(config), 50);
+};
+
+const refreshPreview = async (config: Config | undefined, limit: number = 20) => {
+  const exportables = getExportables().slice(0, limit);
 
   log("Exportables:", exportables);
 
@@ -290,10 +299,10 @@ figma.ui.onmessage = async (message) => {
     const storedConfig = await StoredConfig.get();
     log("Loaded stored config:", storedConfig);
     figma.ui.postMessage({ type: "load", config: storedConfig });
-    await refreshPreview(storedConfig);
+    await refreshPreviewDebounced(storedConfig);
   } else if (type === "config") {
     const storedConfig = await StoredConfig.set(message.config);
-    await refreshPreview(storedConfig);
+    await refreshPreviewDebounced(storedConfig);
   } else if (type === "export") {
     await generateExport(message.config);
   }
@@ -301,7 +310,7 @@ figma.ui.onmessage = async (message) => {
 
 figma.on("selectionchange", async () => {
   const storedConfig = await StoredConfig.get();
-  await refreshPreview(storedConfig);
+  await refreshPreviewDebounced(storedConfig);
 });
 
 figma.on("close", () => {

@@ -36,7 +36,7 @@
       </div>
     </div>
   </div>
-  <div class="scroll-box rounded-box gap-2 h-[206] mt-2 py-2">
+  <div class="scroll-box rounded-box gap-2 h-[150] mt-2 py-2">
     {#each layerMods as layerMod, index}
       {#if index > 0}
         <Divider />

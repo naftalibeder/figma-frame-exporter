@@ -129,6 +129,21 @@
   <Divider />
 
   <div class="section">
+    <ImageOptions
+      imageConfig={config}
+      onChange={(imageConfig) => {
+        config = {
+          ...config,
+          ...imageConfig,
+        };
+        onChangeConfig();
+      }}
+    />
+  </div>
+
+  <Divider />
+
+  <div class="section">
     <LayerModList
       layerMods={config.layerMods}
       {layerModMatches}
@@ -144,20 +159,6 @@
 
   <Divider />
 
-  <div class="section">
-    <ImageOptions
-      imageConfig={config}
-      onChange={(imageConfig) => {
-        config = {
-          ...config,
-          ...imageConfig,
-        };
-        onChangeConfig();
-      }}
-    />
-  </div>
-
-  <Divider />
   <div class="section">
     <OutputPreview {exampleAssets} />
   </div>

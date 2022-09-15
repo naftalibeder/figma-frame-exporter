@@ -1,5 +1,5 @@
 <script lang="ts" type="module">
-  import { Section, SelectMenu, Input } from "figma-plugin-ds-svelte";
+  import { Section, SelectMenu, Input, Type } from "figma-plugin-ds-svelte";
   import convertCase from "../../node_modules/js-convert-case/lib/index";
   import { CasingOption, casingStrings, NameConfig } from "types";
 
@@ -26,9 +26,15 @@
   };
 </script>
 
-<div class="flex flex-1 flex-col">
-  <div>
-    <Section>File name</Section>
+<div>
+  <div class="flex flex-col gap-2">
+    <div class="flex flex-col">
+      <Section>File names</Section>
+      <div class="section-subtitle">
+        <Type>Choose the content, connectors, and format for the names of the exported files.</Type>
+      </div>
+    </div>
+
     <Input
       type="text"
       placeholder="Enter a syntax"
@@ -38,53 +44,46 @@
         _onChangeConfig();
       }}
     />
-  </div>
 
-  <div class="flex flex-row gap-2">
-    <div class="flex flex-1 flex-col">
-      <Section>Frame name format</Section>
-      <SelectMenu
-        bind:menuItems={casingOptions}
-        on:change={(e) => {
-          nameConfig.casing = e.detail.value;
+    <SelectMenu
+      bind:menuItems={casingOptions}
+      on:change={(e) => {
+        nameConfig.casing = e.detail.value;
+        _onChangeConfig();
+      }}
+    />
+
+    <div class="flex flex-1 flex-row gap-2">
+      <Input
+        type="text"
+        placeholder="Before"
+        disabled={!hasVariants}
+        bind:value={nameConfig.connectors.before}
+        on:input={(e) => {
+          nameConfig.connectors.before = e.target["value"];
           _onChangeConfig();
         }}
       />
-    </div>
-    <div class="flex flex-1 flex-col">
-      <Section>Variants connector</Section>
-      <div class="flex flex-1 flex-row">
-        <Input
-          type="text"
-          placeholder="Before"
-          disabled={!hasVariants}
-          bind:value={nameConfig.connectors.before}
-          on:input={(e) => {
-            nameConfig.connectors.before = e.target["value"];
-            _onChangeConfig();
-          }}
-        />
-        <Input
-          type="text"
-          placeholder="Between"
-          disabled={!hasVariants}
-          bind:value={nameConfig.connectors.between}
-          on:input={(e) => {
-            nameConfig.connectors.between = e.target["value"];
-            _onChangeConfig();
-          }}
-        />
-        <Input
-          type="text"
-          placeholder="After"
-          disabled={!hasVariants}
-          bind:value={nameConfig.connectors.after}
-          on:input={(e) => {
-            nameConfig.connectors.after = e.target["value"];
-            _onChangeConfig();
-          }}
-        />
-      </div>
+      <Input
+        type="text"
+        placeholder="Between"
+        disabled={!hasVariants}
+        bind:value={nameConfig.connectors.between}
+        on:input={(e) => {
+          nameConfig.connectors.between = e.target["value"];
+          _onChangeConfig();
+        }}
+      />
+      <Input
+        type="text"
+        placeholder="After"
+        disabled={!hasVariants}
+        bind:value={nameConfig.connectors.after}
+        on:input={(e) => {
+          nameConfig.connectors.after = e.target["value"];
+          _onChangeConfig();
+        }}
+      />
     </div>
   </div>
 </div>
