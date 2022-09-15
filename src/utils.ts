@@ -85,6 +85,8 @@ export const buildExportSettings = (config: {
   }
 };
 
+export const delay = async (ms: number) => await new Promise((res) => setTimeout(res, ms));
+
 export const log = (...args: any[]) => {
   console.log("[Frame Exporter]", ...args);
 };

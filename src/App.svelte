@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { Type, Icon, IconForward } from "figma-plugin-ds-svelte";
   import JSZip from "../node_modules/jszip/dist/jszip.min.js";
-  import { log } from "utils";
+  import { delay, log } from "utils";
   import { Asset, Config, ExportPayload, LayerModMatches } from "./types";
   import Divider from "./components/Divider.svelte";
   import OutputPreview from "./components/OutputPreview.svelte";
@@ -27,6 +27,8 @@
   let hasVariants = false;
   let layerModMatches: LayerModMatches = {};
   let exampleAssets: Asset[] = [];
+  let exportLoading = false;
+  $: exportButtonDisabled = nodeCount === 0 || exportLoading;
 
   window.onmessage = async (event: MessageEvent) => {
     const message = event.data.pluginMessage;
@@ -43,6 +45,7 @@
     } else if (type === "export") {
       const exportPayload = message.exportPayload as ExportPayload;
       await presentDownloadableArchive(exportPayload.assets);
+      exportLoading = false;
     }
   };
 
@@ -71,7 +74,13 @@
     );
   };
 
-  const onSelectExport = () => {
+  const onSelectExport = async () => {
+    if (exportButtonDisabled) {
+      return;
+    }
+
+    exportLoading = true;
+    await delay(10);
     parent.postMessage(
       {
         pluginMessage: {
@@ -167,11 +176,13 @@
 
   <div
     class={"flex flex-1 flex-row items-center justify-between px-4 pt-3 cursor-pointer " +
-      (nodeCount > 0 ? "opacity-80 hover:opacity-100" : "opacity-50 hover:opacity-60")}
-    disabled={nodeCount === 0}
+      (exportButtonDisabled ? "opacity-50 hover:opacity-60" : "opacity-80 hover:opacity-100")}
+    disabled={exportButtonDisabled}
     on:click={onSelectExport}
   >
-    <Type weight="bold">Export {nodeCount} images</Type>
+    <Type weight="bold">
+      {exportLoading ? "Generating export..." : `Export ${nodeCount} images`}
+    </Type>
     <Icon iconName={IconForward} />
   </div>
 </div>

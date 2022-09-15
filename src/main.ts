@@ -299,18 +299,18 @@ figma.ui.onmessage = async (message) => {
     const storedConfig = await StoredConfig.get();
     log("Loaded stored config:", storedConfig);
     figma.ui.postMessage({ type: "load", config: storedConfig });
-    await refreshPreviewDebounced(storedConfig);
+    refreshPreviewDebounced(storedConfig);
   } else if (type === "config") {
     const storedConfig = await StoredConfig.set(message.config);
-    await refreshPreviewDebounced(storedConfig);
+    refreshPreviewDebounced(storedConfig);
   } else if (type === "export") {
-    await generateExport(message.config);
+    generateExport(message.config);
   }
 };
 
 figma.on("selectionchange", async () => {
   const storedConfig = await StoredConfig.get();
-  await refreshPreviewDebounced(storedConfig);
+  refreshPreviewDebounced(storedConfig);
 });
 
 figma.on("close", () => {
