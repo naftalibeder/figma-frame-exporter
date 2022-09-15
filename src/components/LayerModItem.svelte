@@ -38,7 +38,6 @@
       <div class="flex flex-1 relative">
         <Input
           class="flex flex-1"
-          type="text"
           placeholder="Layers matching..."
           bind:value={layerMod.query}
           on:input={(e) => {
@@ -57,8 +56,8 @@
       <div class="flex flex-shrink-0 w-[32]">
         <Type>Set</Type>
       </div>
-      <div class="flex flex-1 flex-row items-center gap-2">
-        <div class="grow">
+      <div class="flex flex-1 flex-row items-center gap-2 relative">
+        <div class="grow relative">
           <SelectMenu
             bind:menuItems={layerPropertyOptions}
             on:change={(e) => {
@@ -70,7 +69,6 @@
         <Type>to</Type>
         <Input
           class="w-[80]"
-          type="text"
           placeholder="Value"
           bind:value={layerMod.value}
           on:input={(e) => {

@@ -4,7 +4,6 @@
   import { CasingOption, casingStrings, NameConfig } from "types";
 
   export let nameConfig: NameConfig;
-  export let hasVariants: boolean;
   export let onChange: (_nameConfig: NameConfig) => void;
 
   let casingOptions: CasingOption[] = casingStrings.map((s) => {
@@ -36,7 +35,6 @@
     </div>
 
     <Input
-      type="text"
       placeholder="Enter a syntax"
       bind:value={nameConfig.syntax}
       on:input={(e) => {
@@ -55,9 +53,7 @@
 
     <div class="flex flex-1 flex-row gap-2">
       <Input
-        type="text"
         placeholder="Before"
-        disabled={!hasVariants}
         bind:value={nameConfig.connectors.before}
         on:input={(e) => {
           nameConfig.connectors.before = e.target["value"];
@@ -65,9 +61,7 @@
         }}
       />
       <Input
-        type="text"
         placeholder="Between"
-        disabled={!hasVariants}
         bind:value={nameConfig.connectors.between}
         on:input={(e) => {
           nameConfig.connectors.between = e.target["value"];
@@ -75,9 +69,7 @@
         }}
       />
       <Input
-        type="text"
         placeholder="After"
-        disabled={!hasVariants}
         bind:value={nameConfig.connectors.after}
         on:input={(e) => {
           nameConfig.connectors.after = e.target["value"];

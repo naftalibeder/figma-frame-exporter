@@ -4,7 +4,8 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv build"
+    "start": "sirv build",
+    "clean": "rm -rf node_modules package-lock.json build && npm install"
   },
   "author": "Naftali Beder",
   "license": "MIT",
@@ -19,7 +20,7 @@
     "caniuse-lite": "1.0.30001378",
     "cssnano": "5.1.13",
     "figma-plugin-ds": "1.0.1",
-    "figma-plugin-ds-svelte": "github:naftalibeder/figma-plugin-ds-svelte",
+    "figma-plugin-ds-svelte": "github:naftalibeder/figma-plugin-ds-svelte#fix/select-menu-clip",
     "rollup": "2.78.0",
     "rollup-plugin-html-bundle": "0.0.3",
     "rollup-plugin-livereload": "2.0.5",
