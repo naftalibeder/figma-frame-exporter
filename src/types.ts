@@ -31,8 +31,8 @@ export const layerProperties = [
 ] as const;
 export type LayerProperty = typeof layerProperties[number];
 
-export interface Config extends NameConfig, ImageConfig {
-  layerMods: LayerMod[];
+export interface Config extends NameConfig, ImageConfig, LayerModConfig {
+  id: string;
 }
 
 export interface NameConfig {
@@ -44,6 +44,10 @@ export interface NameConfig {
 export interface ImageConfig {
   sizeConstraint: string;
   extension: Extension;
+}
+
+export interface LayerModConfig {
+  layerMods: LayerMod[];
 }
 
 export interface CasingOption {

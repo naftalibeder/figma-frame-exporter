@@ -12,6 +12,7 @@
   import ImageOptions from "./components/ImageOptions.svelte";
 
   let config: Config = {
+    id: "",
     syntax: "",
     connectors: {
       before: "",

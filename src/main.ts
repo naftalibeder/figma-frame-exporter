@@ -12,13 +12,19 @@ import { withCasing, buildExportSettings, log } from "./utils";
 
 figma.showUI(__html__, { width: 360, height: 907 });
 
+type StoreType = {
+  selectedConfigId: string;
+  configs: Record<string, Config>;
+};
+
 const STORE_NAME = "store";
 
 let previewTimer: number | undefined;
 
-class StoredConfig {
-  static get = async (): Promise<Config> => {
-    const defaultConfig: Config = {
+class Store {
+  private static defaultConfig = (): Config => {
+    return {
+      id: `${Math.random()}`,
       syntax: "$F$V",
       connectors: {
         before: "",
@@ -32,19 +38,44 @@ class StoredConfig {
         { id: `${Math.random()}`, query: undefined, property: undefined, value: undefined },
       ],
     };
+  };
 
-    let storedConfig: Config | undefined = await figma.clientStorage.getAsync(STORE_NAME);
-    if (storedConfig) {
-      const mergedConfig = Object.assign(defaultConfig, storedConfig);
-      return mergedConfig;
+  static getCurrentConfig = async (): Promise<Config> => {
+    let store: StoreType | undefined = await figma.clientStorage.getAsync(STORE_NAME);
+    let configs = store?.configs;
+    log("Store:", store);
+
+    if (configs) {
+      return configs[store.selectedConfigId];
     } else {
-      return defaultConfig;
+      return this.defaultConfig();
     }
   };
 
-  static set = async (config: Config): Promise<Config> => {
-    await figma.clientStorage.setAsync(STORE_NAME, config);
-    return config;
+  static setCurrentConfig = async (config: Config): Promise<Config> => {
+    let store: StoreType | undefined = await figma.clientStorage.getAsync(STORE_NAME);
+    let configs = store?.configs;
+
+    if (configs) {
+      configs[config.id] = config;
+    } else {
+      configs = { [config.id]: config };
+    }
+
+    store = {
+      selectedConfigId: config.id,
+      configs,
+    };
+
+    log("Setting store:", store);
+
+    try {
+      await figma.clientStorage.setAsync(STORE_NAME, store);
+    } catch (e) {
+      log("Error setting store:", e);
+    }
+
+    return store.configs[config.id];
   };
 }
 
@@ -296,12 +327,11 @@ figma.ui.onmessage = async (message) => {
   log("Message:", type);
 
   if (type === "init") {
-    const storedConfig = await StoredConfig.get();
-    log("Loaded stored config:", storedConfig);
+    const storedConfig = await Store.getCurrentConfig();
     figma.ui.postMessage({ type: "load", config: storedConfig });
     refreshPreviewDebounced(storedConfig);
   } else if (type === "config") {
-    const storedConfig = await StoredConfig.set(message.config);
+    const storedConfig = await Store.setCurrentConfig(message.config);
     refreshPreviewDebounced(storedConfig);
   } else if (type === "export") {
     generateExport(message.config);
@@ -309,11 +339,11 @@ figma.ui.onmessage = async (message) => {
 };
 
 figma.on("selectionchange", async () => {
-  const storedConfig = await StoredConfig.get();
+  const storedConfig = await Store.getCurrentConfig();
   refreshPreviewDebounced(storedConfig);
 });
 
 figma.on("close", () => {
   tempFrame.remove();
-  log("closed");
+  log("Exited");
 });
