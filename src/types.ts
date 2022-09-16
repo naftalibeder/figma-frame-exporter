@@ -1,3 +1,5 @@
+export type Page = "configure" | "saved";
+
 export type Connectors = {
   before: string;
   between: string;
