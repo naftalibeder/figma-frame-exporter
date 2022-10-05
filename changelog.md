@@ -1,5 +1,6 @@
 # 12
 
+- Added the ability to save multiple configurations
 - Created flow for applying non-destructive modifications to layers before export
 - Updated method of specifying filenames to allow more specificity
 - Overhauled visual style
