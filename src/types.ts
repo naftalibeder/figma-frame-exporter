@@ -1,3 +1,8 @@
+export type Store = {
+  selectedConfigId: string;
+  configs: Record<string, Config>;
+};
+
 export type Page = "configure" | "saved";
 
 export type Connectors = {
@@ -35,6 +40,7 @@ export type LayerProperty = typeof layerProperties[number];
 
 export interface Config extends NameConfig, ImageConfig, LayerModConfig {
   id: string;
+  name: string;
 }
 
 export interface NameConfig {

@@ -51,11 +51,9 @@
           onChangeLayerMods(mods);
         }}
         onSelectDelete={() => {
-          if (layerMods.length > 1) {
-            const mods = [...layerMods];
-            mods.splice(index, 1);
-            onChangeLayerMods(mods);
-          }
+          const mods = [...layerMods];
+          mods.splice(index, 1);
+          onChangeLayerMods(mods);
         }}
       />
     {/each}

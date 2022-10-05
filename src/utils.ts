@@ -1,6 +1,6 @@
 import convertCase from "../node_modules/js-convert-case/lib/index";
 
-import { Casing, Extension, Size } from "./types";
+import { Casing, Config, Extension, Size } from "./types";
 
 export const randomId = () => `${Math.floor(Math.random() * 1000)}`;
 
@@ -44,6 +44,7 @@ export const buildExportSettings = (config: {
         settings: {
           format: extension,
           constraint: { type: "SCALE", value },
+          useAbsoluteBounds: true,
         },
         destSize: {
           width: srcSize.width * value,
@@ -83,6 +84,30 @@ export const buildExportSettings = (config: {
       };
     }
   }
+};
+
+export const buildDefaultConfig = (): Config => {
+  return {
+    id: `${Math.random()}`,
+    name: "",
+    syntax: "$F$V",
+    connectors: {
+      before: "",
+      between: "",
+      after: "",
+    },
+    casing: "original",
+    sizeConstraint: "2x",
+    extension: "PNG",
+    layerMods: [
+      // {
+      //   id: `${Math.random()}`,
+      //   query: undefined,
+      //   property: undefined,
+      //   value: undefined,
+      // },
+    ],
+  };
 };
 
 export const delay = async (ms: number) => await new Promise((res) => setTimeout(res, ms));

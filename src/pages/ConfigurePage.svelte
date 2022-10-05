@@ -1,8 +1,8 @@
 <script lang="ts" type="module">
-  import "../../styles/main.css";
   import { onMount } from "svelte";
   import { Type, Icon, IconForward } from "figma-plugin-ds-svelte";
   import JSZip from "../../node_modules/jszip/dist/jszip.min.js";
+  import { store } from "store";
   import { delay, log } from "utils";
   import { Asset, Config, ExportPayload, LayerModMatches } from "types";
   import Divider from "../components/Divider.svelte";
@@ -11,66 +11,51 @@
   import LayerModList from "../components/LayerModList.svelte";
   import ImageOptions from "../components/ImageOptions.svelte";
 
-  let config: Config = {
-    id: "",
-    syntax: "",
-    connectors: {
-      before: "",
-      between: "",
-      after: "",
-    },
-    casing: "camel",
-    sizeConstraint: "",
-    extension: "PNG",
-    layerMods: [],
-  };
+  export let config: Config | undefined;
+
   let nodeCount = 0;
   let layerModMatches: LayerModMatches = {};
   let exampleAssets: Asset[] = [];
   let exportLoading = false;
   $: exportButtonDisabled = nodeCount === 0 || exportLoading;
 
-  window.onmessage = async (event: MessageEvent) => {
-    const message = event.data.pluginMessage;
-    const type = message.type;
-
-    if (type === "load") {
-      config = message.config as Config;
-    } else if (type === "preview") {
-      const exportPayload = message.exportPayload as ExportPayload;
-      nodeCount = exportPayload.nodeCount;
-      layerModMatches = exportPayload.layerModMatches;
-      exampleAssets = await buildPreviewImages(exportPayload.assets);
-    } else if (type === "export") {
-      const exportPayload = message.exportPayload as ExportPayload;
-      await presentDownloadableArchive(exportPayload.assets);
-      exportLoading = false;
-    }
-  };
-
   onMount(() => {
     parent.postMessage(
       {
         pluginMessage: {
-          type: "init",
+          type: "INIT",
         },
       },
       "*"
     );
   });
 
+  window.onmessage = async (event: MessageEvent) => {
+    const message = event.data.pluginMessage;
+    const type = message.type;
+    log("Message:", type, message);
+
+    if (type === "PREVIEW") {
+      const exportPayload = message.exportPayload as ExportPayload;
+      nodeCount = exportPayload.nodeCount;
+      layerModMatches = exportPayload.layerModMatches;
+      exampleAssets = await buildPreviewImages(exportPayload.assets);
+    } else if (type === "EXPORT") {
+      const exportPayload = message.exportPayload as ExportPayload;
+      await presentDownloadableArchive(exportPayload.assets);
+      exportLoading = false;
+    }
+  };
+
   const onChangeConfig = () => {
     log("Updated config:", config);
-
-    parent.postMessage(
-      {
-        pluginMessage: {
-          type: "config",
-          config,
-        },
+    $store = {
+      selectedConfigId: config.id,
+      configs: {
+        ...$store.configs,
+        [config.id]: config,
       },
-      "*"
-    );
+    };
   };
 
   const onSelectExport = async () => {
@@ -83,7 +68,7 @@
     parent.postMessage(
       {
         pluginMessage: {
-          type: "export",
+          type: "EXPORT",
           config,
         },
       },

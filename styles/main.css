@@ -8,7 +8,7 @@
     @apply text-sm;
   }
   .scroll-box {
-    @apply flex flex-col overflow-scroll overflow-x-hidden max-h-60 mt-2 py-1 px-2;
+    @apply flex flex-col overflow-scroll overflow-x-hidden  mt-2 py-1 px-2;
   }
   .rounded-box {
     @apply outline outline-1 outline-gray-200 rounded-sm;

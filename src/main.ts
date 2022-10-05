@@ -7,77 +7,57 @@ import {
   LayerMod,
   ExportPayload,
   LayerModMatches,
+  Store,
 } from "./types";
-import { withCasing, buildExportSettings, log } from "./utils";
+import { withCasing, buildExportSettings, log, buildDefaultConfig } from "./utils";
 
-figma.showUI(__html__, { width: 360, height: 907 });
+figma.showUI(__html__, { width: 360, height: 952, themeColors: true });
 
-type StoreType = {
-  selectedConfigId: string;
-  configs: Record<string, Config>;
-};
+// Store.
 
 const STORE_NAME = "store";
 
+const defaultStore: Store = (() => {
+  const initialConfig = buildDefaultConfig();
+
+  return {
+    selectedConfigId: initialConfig.id,
+    configs: {
+      [initialConfig.id]: initialConfig,
+    },
+  };
+})();
+
+const getStore = async (): Promise<Store> => {
+  let store: Store | undefined;
+  try {
+    store = await figma.clientStorage.getAsync(STORE_NAME);
+    if (!store) {
+      throw new Error("Store is undefined");
+    }
+    log("Get store:", store);
+  } catch (e) {
+    store = defaultStore;
+    log("Error getting store:", e);
+  }
+
+  return store;
+};
+
+const setStore = async (store: Store): Promise<Store> => {
+  try {
+    await figma.clientStorage.setAsync(STORE_NAME, store);
+    log("Set store:", store);
+  } catch (e) {
+    log("Error setting store:", e);
+  }
+
+  return store;
+};
+
+// Everything.
+
 let previewTimer: number | undefined;
-
-class Store {
-  private static defaultConfig = (): Config => {
-    return {
-      id: `${Math.random()}`,
-      syntax: "$F$V",
-      connectors: {
-        before: "",
-        between: "",
-        after: "",
-      },
-      casing: "original",
-      sizeConstraint: "2x",
-      extension: "PNG",
-      layerMods: [
-        { id: `${Math.random()}`, query: undefined, property: undefined, value: undefined },
-      ],
-    };
-  };
-
-  static getCurrentConfig = async (): Promise<Config> => {
-    let store: StoreType | undefined = await figma.clientStorage.getAsync(STORE_NAME);
-    let configs = store?.configs;
-    log("Store:", store);
-
-    if (configs) {
-      return configs[store.selectedConfigId];
-    } else {
-      return this.defaultConfig();
-    }
-  };
-
-  static setCurrentConfig = async (config: Config): Promise<Config> => {
-    let store: StoreType | undefined = await figma.clientStorage.getAsync(STORE_NAME);
-    let configs = store?.configs;
-
-    if (configs) {
-      configs[config.id] = config;
-    } else {
-      configs = { [config.id]: config };
-    }
-
-    store = {
-      selectedConfigId: config.id,
-      configs,
-    };
-
-    log("Setting store:", store);
-
-    try {
-      await figma.clientStorage.setAsync(STORE_NAME, store);
-    } catch (e) {
-      log("Error setting store:", e);
-    }
-
-    return store.configs[config.id];
-  };
-}
 
 class TempFrame {
   frame: FrameNode | undefined;
@@ -167,15 +147,15 @@ const getExportPayload = async (
       data: new Uint8Array(),
     };
 
-    let node = (figma.getNodeById(e.id) as FrameNode).clone();
+    let node = figma.getNodeById(e.id) as FrameNode;
 
     // Modify node or its children if matched by a layer mod's query.
     for (const layerMod of layerMods) {
-      const { node: modifiedNode, matchedNodeCount } = withLayerMods(node, layerMod);
-      node = modifiedNode;
+      const payload = withLayerMods(node, layerMod);
+      node = payload.node;
       tempFrame.frame?.appendChild(node);
 
-      layerModMatches[layerMod.id] += matchedNodeCount;
+      layerModMatches[layerMod.id] += payload.matchedNodeCount;
     }
 
     // Build concatenated variants part of filename.
@@ -210,17 +190,21 @@ const getExportPayload = async (
       constraint: sizeConstraint,
       srcSize: e.size,
     };
-    const { destSize } = buildExportSettings(baseExportConfig);
-    asset.size = destSize;
-    const { settings } = buildExportSettings(
-      previewSettings.isFinal
-        ? baseExportConfig
-        : {
-            extension: "PNG",
-            constraint: "",
-            srcSize: previewSettings.thumbSize,
-          }
-    );
+    let settings: ExportSettings;
+    if (previewSettings.isFinal) {
+      const payload = buildExportSettings(baseExportConfig);
+      settings = payload.settings;
+    } else {
+      let displayPayload = buildExportSettings(baseExportConfig);
+      asset.size = displayPayload.destSize;
+      const payload = buildExportSettings({
+        extension: "PNG",
+        constraint: "",
+        srcSize: previewSettings.thumbSize,
+      });
+      settings = payload.settings;
+    }
+
     try {
       asset.data = await (<ExportMixin>node).exportAsync(settings);
     } catch (e) {
@@ -240,6 +224,8 @@ const withLayerMods = (
   node: FrameNode,
   layerMod: LayerMod
 ): { node: FrameNode; matchedNodeCount: number } => {
+  node = node.clone();
+
   const query = layerMod.query?.trim() ?? "";
   const { property, value } = layerMod;
 
@@ -284,12 +270,12 @@ const withLayerMods = (
   return { node, matchedNodeCount: matchedNodes.length };
 };
 
-const refreshPreviewDebounced = (config: Config | undefined) => {
+const refreshPreview = (config: Config | undefined) => {
   clearTimeout(previewTimer);
-  previewTimer = setTimeout(() => refreshPreview(config), 50);
+  previewTimer = setTimeout(() => _refreshPreview(config), 200);
 };
 
-const refreshPreview = async (config: Config | undefined, limit: number = 20) => {
+const _refreshPreview = async (config: Config | undefined, limit: number = 20) => {
   const exportables = getExportables().slice(0, limit);
 
   log("Exportables:", exportables);
@@ -307,7 +293,7 @@ const refreshPreview = async (config: Config | undefined, limit: number = 20) =>
   }
 
   figma.ui.postMessage({
-    type: "preview",
+    type: "PREVIEW",
     exportPayload,
   });
 };
@@ -317,30 +303,33 @@ const generateExport = async (config: Config) => {
   const exportPayload = await getExportPayload(exportables, config, { isFinal: true });
 
   figma.ui.postMessage({
-    type: "export",
+    type: "EXPORT",
     exportPayload,
   });
 };
 
 figma.ui.onmessage = async (message) => {
   const type = message.type;
-  log("Message:", type);
+  log("Message:", type, message);
 
-  if (type === "init") {
-    const storedConfig = await Store.getCurrentConfig();
-    figma.ui.postMessage({ type: "load", config: storedConfig });
-    refreshPreviewDebounced(storedConfig);
-  } else if (type === "config") {
-    const storedConfig = await Store.setCurrentConfig(message.config);
-    refreshPreviewDebounced(storedConfig);
-  } else if (type === "export") {
+  if (type === "INIT") {
+    const store = await getStore();
+    figma.ui.postMessage({ type: "LOAD", store });
+    const config = store.configs[store.selectedConfigId];
+    refreshPreview(config);
+  } else if (type === "SET_STORE") {
+    const store = await setStore(message.store);
+    const config = store.configs[store.selectedConfigId];
+    refreshPreview(config);
+  } else if (type === "EXPORT") {
     generateExport(message.config);
   }
 };
 
 figma.on("selectionchange", async () => {
-  const storedConfig = await Store.getCurrentConfig();
-  refreshPreviewDebounced(storedConfig);
+  const store = await getStore();
+  const config = store.configs[store.selectedConfigId];
+  refreshPreview(config);
 });
 
 figma.on("close", () => {
