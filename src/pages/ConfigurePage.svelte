@@ -6,12 +6,13 @@
   import { delay, log } from "utils";
   import { Asset, Config, ExportPayload, LayerModMatches } from "types";
   import Divider from "../components/Divider.svelte";
-  import OutputPreview from "../components/OutputPreview.svelte";
+  import SelectedConfigOptions from "../components/SelectedConfigOptions.svelte";
   import NameOptions from "../components/NameOptions.svelte";
-  import LayerModList from "../components/LayerModList.svelte";
   import ImageOptions from "../components/ImageOptions.svelte";
+  import LayerModList from "../components/LayerModList.svelte";
+  import OutputPreview from "../components/OutputPreview.svelte";
 
-  export let config: Config | undefined;
+  let config: Config = $store.configs[$store.selectedConfigId];
 
   let nodeCount = 0;
   let layerModMatches: LayerModMatches = {};
@@ -48,6 +49,11 @@
   };
 
   const onChangeConfig = () => {
+    log("Changed config:", $store.selectedConfigId);
+    config = $store.configs[$store.selectedConfigId];
+  };
+
+  const onUpdateConfig = () => {
     log("Updated config:", config);
     $store = {
       selectedConfigId: config.id,
@@ -104,68 +110,87 @@
   };
 </script>
 
-<div class="flex flex-1 flex-col">
-  <div class="section">
-    <NameOptions
-      nameConfig={config}
-      onChange={(nameConfig) => {
-        config = {
-          ...config,
-          ...nameConfig,
-        };
-        onChangeConfig();
-      }}
-    />
+<div class="flex flex-1 flex-col overflow-y-hidden">
+  <div class="flex flex-1 flex-col w-full overflow-y-scroll">
+    <div class="section">
+      <SelectedConfigOptions
+        selectedConfigId={config.id}
+        configs={$store.configs}
+        onChange={(id) => {
+          $store.selectedConfigId = id;
+          onChangeConfig();
+        }}
+      />
+    </div>
+
+    <Divider />
+
+    <div class="section">
+      <NameOptions
+        nameConfig={config}
+        onChange={(nameConfig) => {
+          config = {
+            ...config,
+            ...nameConfig,
+          };
+          onUpdateConfig();
+        }}
+      />
+    </div>
+
+    <Divider />
+
+    <div class="section">
+      <ImageOptions
+        imageConfig={config}
+        onChange={(imageConfig) => {
+          config = {
+            ...config,
+            ...imageConfig,
+          };
+          onUpdateConfig();
+        }}
+      />
+    </div>
+
+    <Divider />
+
+    <div class="section">
+      <LayerModList
+        layerMods={config.layerMods}
+        {layerModMatches}
+        onChangeLayerMods={(layerMods) => {
+          config = {
+            ...config,
+            layerMods,
+          };
+          onUpdateConfig();
+        }}
+      />
+    </div>
+
+    <Divider />
+
+    <div class="section">
+      <OutputPreview {exampleAssets} />
+    </div>
   </div>
-
-  <Divider />
-
-  <div class="section">
-    <ImageOptions
-      imageConfig={config}
-      onChange={(imageConfig) => {
-        config = {
-          ...config,
-          ...imageConfig,
-        };
-        onChangeConfig();
-      }}
-    />
-  </div>
-
-  <Divider />
-
-  <div class="section">
-    <LayerModList
-      layerMods={config.layerMods}
-      {layerModMatches}
-      onChangeLayerMods={(layerMods) => {
-        config = {
-          ...config,
-          layerMods,
-        };
-        onChangeConfig();
-      }}
-    />
-  </div>
-
-  <Divider />
-
-  <div class="section">
-    <OutputPreview {exampleAssets} />
-  </div>
-
-  <Divider />
 
   <div
-    class={"flex flex-1 flex-row items-center justify-between px-4 pt-3 cursor-pointer " +
-      (exportButtonDisabled ? "opacity-50 hover:opacity-60" : "opacity-80 hover:opacity-100")}
+    class="flex flex-col justify-center w-full h-16 bg-white cursor-pointer"
     disabled={exportButtonDisabled}
     on:click={onSelectExport}
   >
-    <Type weight="bold">
-      {exportLoading ? "Generating export..." : `Export ${nodeCount} images`}
-    </Type>
-    <Icon iconName={IconForward} />
+    <Divider />
+
+    <div
+      class={"flex flex-1 flex-row items-center justify-between pl-4 pr-2 pointer-events-none " +
+        (exportButtonDisabled ? "opacity-50 hover:opacity-60" : "opacity-80 hover:opacity-100")}
+    >
+      <Type weight="bold">
+        {exportLoading ? "Generating export..." : `Export ${nodeCount} images`}
+      </Type>
+      <Icon iconName={IconForward} />
+    </div>
   </div>
 </div>

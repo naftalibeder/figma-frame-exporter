@@ -3,5 +3,9 @@
 </script>
 
 <div class="flex py-1">
-  <Type color="black3"><slot /></Type>
+  <Type>
+    <div class="text-gray-400">
+      <slot />
+    </div>
+  </Type>
 </div>

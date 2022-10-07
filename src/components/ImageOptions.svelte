@@ -22,9 +22,9 @@
   };
 </script>
 
-<div class="flex flex-1 flex-col">
+<div class="flex flex-col">
   <div class="flex flex-row gap-2">
-    <div class="flex flex-1 flex-col">
+    <div class="flex flex-col">
       <Section>Image size</Section>
       <Input
         type="text"
@@ -37,7 +37,7 @@
         }}
       />
     </div>
-    <div class="flex flex-1 flex-col">
+    <div class="flex flex-col">
       <Section>File type</Section>
       <SelectMenu
         bind:menuItems={extensionOptions}

@@ -4,7 +4,7 @@ import { Casing, Config, Extension, Size } from "./types";
 
 export const randomId = () => `${Math.floor(Math.random() * 1000)}`;
 
-const caseMap: Record<Casing, (s: string) => string> = {
+export const casingMap: Record<Casing, (s: string) => string> = {
   original: (s) => s,
   lower: convertCase.toLowerCase,
   upper: convertCase.toUpperCase,
@@ -19,7 +19,7 @@ const caseMap: Record<Casing, (s: string) => string> = {
 export const withCasing = (value: string, casing: Casing): string => {
   const values = value
     .split("/")
-    .map((o) => caseMap[casing](o.trim()))
+    .map((o) => casingMap[casing](o.trim()))
     .join("/");
   return values;
 };

@@ -11,7 +11,7 @@ import {
 } from "./types";
 import { withCasing, buildExportSettings, log, buildDefaultConfig } from "./utils";
 
-figma.showUI(__html__, { width: 360, height: 952, themeColors: true });
+figma.showUI(__html__, { width: 360, height: 900, themeColors: true });
 
 // Store.
 
@@ -161,6 +161,11 @@ const getExportPayload = async (
     // Build concatenated variants part of filename.
     let variantsStr = "";
     e.variants.forEach((variant, i) => {
+      if (!variant.value) {
+        console.error("Variant error:", variant);
+        return;
+      }
+
       const value = withCasing(variant.value, casing);
       if (i > 0) {
         variantsStr += `${connectors.between}${value}`;
@@ -282,10 +287,14 @@ const _refreshPreview = async (config: Config | undefined, limit: number = 20) =
 
   let exportPayload: ExportPayload | undefined;
   if (config) {
-    exportPayload = await getExportPayload(exportables, config, {
-      isFinal: false,
-      thumbSize: { width: 32, height: 32 },
-    });
+    try {
+      exportPayload = await getExportPayload(exportables, config, {
+        isFinal: false,
+        thumbSize: { width: 32, height: 32 },
+      });
+    } catch (e) {
+      console.error("Preview error:", e);
+    }
   }
 
   if (!exportPayload) {

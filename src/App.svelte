@@ -35,15 +35,17 @@
   let currentPage: Page = "configure";
 </script>
 
-<div class="flex flex-1 flex-col">
+<div class="flex flex-1 flex-col h-[900] overflow-hidden">
   <Nav bind:currentPage />
   <Divider />
 
   {#if $store}
-    {#if currentPage === "configure"}
-      <ConfigurePage config={$store.configs[$store.selectedConfigId]} />
-    {:else if currentPage === "saved"}
-      <SavedPage />
-    {/if}
+    <div class="flex flex-1 overflow-y-hidden">
+      {#if currentPage === "configure"}
+        <ConfigurePage />
+      {:else if currentPage === "saved"}
+        <SavedPage />
+      {/if}
+    </div>
   {/if}
 </div>

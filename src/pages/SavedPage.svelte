@@ -21,6 +21,18 @@
     };
   };
 
+  const onSelectDuplicate = (id: string) => {
+    const defaultConfig = buildDefaultConfig();
+
+    const newConfig = { ...$store.configs[id] };
+    newConfig.id = defaultConfig.id;
+
+    $store.configs = {
+      ...$store.configs,
+      [newConfig.id]: newConfig,
+    };
+  };
+
   const onSelectDelete = (id: string) => {
     if (configKeys.length > 1) {
       delete $store.configs[id];
@@ -47,34 +59,40 @@
   };
 </script>
 
-<div class="section">
-  <div class="flex flex-row gap-2 justify-between">
-    <div class="flex flex-col">
-      <Section>Saved configurations</Section>
-      <div class="section-subtitle">
-        <Type>Click any configuration to set it as active.</Type>
+<div class="flex flex-1 flex-col overflow-y-hidden">
+  <div class="flex flex-1 flex-col w-full overflow-y-scroll">
+    <div class="section">
+      <div class="flex flex-row gap-2 justify-between">
+        <div class="flex flex-col">
+          <Section>Saved configurations</Section>
+          <div class="section-subtitle">
+            <Type>Add a new configuration or rename an existing one.</Type>
+          </div>
+        </div>
+        <div class="flex items-start" on:click={() => onSelectAdd()}>
+          <div class="flex rounded-md hover:bg-gray-100">
+            <Icon iconName={IconPlus} />
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="flex items-start" on:click={() => onSelectAdd()}>
-      <div class="flex rounded-md hover:bg-gray-100">
-        <Icon iconName={IconPlus} />
-      </div>
-    </div>
-  </div>
-  <div class="scroll-box rounded-box max-h-[826]">
-    {#each Object.entries($store.configs) as [id, config], index}
-      {#if index > 0}
-        <Divider />
-      {/if}
+      <div class="space-y-4 mt-4">
+        {#each Object.entries($store.configs) as [id, config], index}
+          {#if index > 0}
+            <div class="px-2">
+              <Divider />
+            </div>
+          {/if}
 
-      <SavedConfigItem
-        {config}
-        isSelected={id === $store.selectedConfigId}
-        isSoleItem={configKeys.length === 1}
-        onSelect={() => onSelectConfig(id)}
-        onChangeConfigName={(name) => onChangeConfigName(id, name)}
-        onSelectDelete={() => onSelectDelete(id)}
-      />
-    {/each}
+          <div class="pl-2">
+            <SavedConfigItem
+              {config}
+              onChangeConfigName={(name) => onChangeConfigName(id, name)}
+              onSelectDuplicate={() => onSelectDuplicate(id)}
+              onSelectDelete={() => onSelectDelete(id)}
+            />
+          </div>
+        {/each}
+      </div>
+    </div>
   </div>
 </div>

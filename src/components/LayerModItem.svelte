@@ -29,7 +29,7 @@
   }
 </script>
 
-<div class="flex flex-row">
+<div class="flex flex-row space-x-2">
   <div class="flex flex-1 flex-col gap-1">
     <div class="flex flex-row items-center">
       <div class="flex flex-shrink-0 w-[32]">

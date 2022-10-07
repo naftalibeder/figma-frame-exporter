@@ -20,7 +20,7 @@
   <div class="section-subtitle">
     <Type>Examples of output image files will appear below.</Type>
   </div>
-  <div class="scroll-box rounded-box h-[206]">
+  <div class="mt-2 px-2">
     {#if exampleAssets.length > 0}
       {#each exampleAssets as exampleAsset, index}
         {#if index > 0}

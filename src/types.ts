@@ -58,6 +58,13 @@ export interface LayerModConfig {
   layerMods: LayerMod[];
 }
 
+export interface ConfigOption {
+  value: string;
+  label: string;
+  group: string | null;
+  selected: boolean;
+}
+
 export interface CasingOption {
   value: Casing;
   label: string;

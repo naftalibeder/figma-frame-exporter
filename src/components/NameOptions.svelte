@@ -1,15 +1,18 @@
 <script lang="ts" type="module">
   import { Section, SelectMenu, Input, Type } from "figma-plugin-ds-svelte";
-  import convertCase from "../../node_modules/js-convert-case/lib/index";
+  import { toSentenceCase } from "js-convert-case";
   import { CasingOption, casingStrings, NameConfig } from "types";
+  import { casingMap } from "utils";
 
   export let nameConfig: NameConfig;
   export let onChange: (_nameConfig: NameConfig) => void;
 
-  let casingOptions: CasingOption[] = casingStrings.map((s) => {
+  let casingOptions: CasingOption[] = casingStrings.map((c) => {
+    const example = casingMap[c]("the quick brown fox");
+    const label = `${toSentenceCase(c)} (${example})`;
     return {
-      value: s,
-      label: convertCase.toSentenceCase(s),
+      value: c,
+      label,
       group: null,
       selected: false,
     };

@@ -36,26 +36,32 @@
       </div>
     </div>
   </div>
-  <div class="scroll-box rounded-box gap-2 h-[150] mt-2 py-2">
-    {#each layerMods as layerMod, index}
-      {#if index > 0}
-        <Divider />
-      {/if}
+  {#if layerMods.length > 0}
+    <div class="space-y-4 mt-4">
+      {#each layerMods as layerMod, index}
+        {#if index > 0}
+          <div class="px-2">
+            <Divider />
+          </div>
+        {/if}
 
-      <LayerModItem
-        {layerMod}
-        matchedNodeCount={layerModMatches[layerMod.id] ?? 0}
-        onChange={(mod) => {
-          const mods = [...layerMods];
-          mods[index] = mod;
-          onChangeLayerMods(mods);
-        }}
-        onSelectDelete={() => {
-          const mods = [...layerMods];
-          mods.splice(index, 1);
-          onChangeLayerMods(mods);
-        }}
-      />
-    {/each}
-  </div>
+        <div class="pl-2">
+          <LayerModItem
+            {layerMod}
+            matchedNodeCount={layerModMatches[layerMod.id] ?? 0}
+            onChange={(mod) => {
+              const mods = [...layerMods];
+              mods[index] = mod;
+              onChangeLayerMods(mods);
+            }}
+            onSelectDelete={() => {
+              const mods = [...layerMods];
+              mods.splice(index, 1);
+              onChangeLayerMods(mods);
+            }}
+          />
+        </div>
+      {/each}
+    </div>
+  {/if}
 </div>
