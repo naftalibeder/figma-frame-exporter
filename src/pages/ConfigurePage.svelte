@@ -112,18 +112,20 @@
 
 <div class="flex flex-1 flex-col overflow-y-hidden">
   <div class="flex flex-1 flex-col w-full overflow-y-scroll">
-    <div class="section">
-      <SelectedConfigOptions
-        selectedConfigId={config.id}
-        configs={$store.configs}
-        onChange={(id) => {
-          $store.selectedConfigId = id;
-          onChangeConfig();
-        }}
-      />
-    </div>
+    {#if Object.keys($store.configs).length > 1}
+      <div class="section">
+        <SelectedConfigOptions
+          selectedConfigId={config.id}
+          configs={$store.configs}
+          onChange={(id) => {
+            $store.selectedConfigId = id;
+            onChangeConfig();
+          }}
+        />
+      </div>
 
-    <Divider />
+      <Divider />
+    {/if}
 
     <div class="section">
       <NameOptions

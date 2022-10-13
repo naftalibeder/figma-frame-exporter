@@ -9,7 +9,7 @@
   let configOptions: ConfigOption[] = Object.entries(configs).map(([id, config]) => {
     return {
       value: id,
-      label: config.name,
+      label: config.name === "" ? "(No name)" : config.name,
       group: null,
       selected: false,
     };

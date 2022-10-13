@@ -7,7 +7,7 @@
 
   $: configKeys = Object.keys($store.configs);
 
-  const onSelectConfig = (id: string) => {
+  const onSelectActivate = (id: string) => {
     $store.selectedConfigId = id;
   };
 
@@ -86,6 +86,8 @@
           <div class="pl-2">
             <SavedConfigItem
               {config}
+              isActive={id === $store.selectedConfigId}
+              onSelectActivate={() => onSelectActivate(id)}
               onChangeConfigName={(name) => onChangeConfigName(id, name)}
               onSelectDuplicate={() => onSelectDuplicate(id)}
               onSelectDelete={() => onSelectDelete(id)}

@@ -4,6 +4,8 @@
   import { Config } from "types";
 
   export let config: Config;
+  export let isActive: boolean;
+  export let onSelectActivate: () => void;
   export let onChangeConfigName: (name: string) => void;
   export let onSelectDuplicate: () => void;
   export let onSelectDelete: () => void;
@@ -47,7 +49,7 @@
               isEditingName = true;
             }}
           >
-            {config.name.length === 0 ? "Click to edit name" : config.name}
+            {config.name.length === 0 ? "(No name)" : config.name}
           </div>
         </Type>
       {:else}
@@ -74,6 +76,22 @@
         {/each}
       </div>
       <div class="flex flex-row space-x-2">
+        <Type>
+          <div
+            class={"flex w-fit cursor-pointer " + (isActive ? "text-blue-400" : "text-gray-400")}
+            on:click={onSelectActivate}
+          >
+            {isActive ? "Active" : "Activate"}
+          </div>
+        </Type>
+        <Type>
+          <div
+            class={"flex w-fit text-gray-400 cursor-pointer"}
+            on:click={() => (isEditingName = true)}
+          >
+            Edit name
+          </div>
+        </Type>
         <Type>
           <div class={"flex w-fit text-gray-400 cursor-pointer"} on:click={onSelectDuplicate}>
             Duplicate
