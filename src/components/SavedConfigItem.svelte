@@ -66,7 +66,9 @@
       {/if}
       <div class="flex flex-row items-center flex-wrap">
         {#each descriptionTags as tag}
-          <div class="flex h-fit px-1 py-0.5 mt-1 mr-1 bg-gray-200 rounded-md whitespace-nowrap">
+          <div
+            class="flex h-fit px-1 py-0.5 mt-2 mr-2 outline outline-1 outline-black rounded-md whitespace-nowrap"
+          >
             <Type>{tag}</Type>
           </div>
         {/each}
