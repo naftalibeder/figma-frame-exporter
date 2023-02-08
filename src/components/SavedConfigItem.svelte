@@ -1,5 +1,5 @@
 <script lang="ts" type="module">
-  import { Type, Icon, Input, IconCheck, IconMinus } from "figma-plugin-ds-svelte";
+  import { Type, Icon, Input, IconMinus } from "figma-plugin-ds-svelte";
   import { toSentenceCase } from "js-convert-case";
   import { Config } from "types";
 
@@ -36,6 +36,38 @@
 
     descriptionTags = parts;
   }
+
+  const onNameLabelClick = (e: MouseEvent) => {
+    isEditingName = true;
+    setTimeout(() => {
+      const elem = document.getElementById("name-input") as HTMLInputElement;
+      elem.focus();
+    }, 10);
+  };
+
+  const onNameInputFocus = (e: FocusEvent) => {
+    const elem = e.target as HTMLInputElement;
+    elem.focus();
+    elem.select();
+  };
+
+  const onNameInputKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const elem = e.target as HTMLElement;
+      elem.blur();
+    }
+  };
+
+  const onNameInputChange = (e: Event) => {
+    const name = e.target["value"];
+    onChangeConfigName(name.trim());
+    isEditingName = false;
+  };
+
+  const onNameInputBlur = (e: FocusEvent) => {
+    isEditingName = false;
+  };
 </script>
 
 <div class="flex flex-row space-x-2">
@@ -45,25 +77,20 @@
         <Type>
           <div
             class={"cursor-pointer " + (config.name.length === 0 ? "text-gray-400" : "")}
-            on:click={() => {
-              isEditingName = true;
-            }}
+            on:click={onNameLabelClick}
           >
             {config.name.length === 0 ? "(No name)" : config.name}
           </div>
         </Type>
       {:else}
         <Input
+          id={"name-input"}
           bind:value={config.name}
           placeholder="Custom name"
-          on:change={(e) => {
-            const name = e.target["value"];
-            onChangeConfigName(name.trim());
-            isEditingName = false;
-          }}
-          on:blur={() => {
-            isEditingName = false;
-          }}
+          on:focus={onNameInputFocus}
+          on:keydown={onNameInputKeyDown}
+          on:change={onNameInputChange}
+          on:blur={onNameInputBlur}
         />
       {/if}
       <div class="flex flex-row items-center flex-wrap">
