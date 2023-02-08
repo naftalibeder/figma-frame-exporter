@@ -1,3 +1,7 @@
+# 13
+
+- Added ability to save and load configurations from a shareable code
+
 # 12
 
 - Added the ability to save multiple configurations
