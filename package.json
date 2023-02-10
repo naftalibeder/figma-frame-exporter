@@ -2,8 +2,8 @@
   "name": "frame-exporter",
   "description": "Export images and variants with configurable filenames",
   "scripts": {
-    "build": "rollup -c",
     "dev": "rollup -c -w",
+    "build": "rollup -c",
     "start": "sirv build",
     "clean": "rm -rf node_modules package-lock.json build && npm install"
   },
