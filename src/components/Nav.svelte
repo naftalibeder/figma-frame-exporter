@@ -4,7 +4,7 @@
 
   export let currentPage: Page;
 
-  const pages: Page[] = ["configure", "saved"];
+  const pages: Page[] = ["configure", "saved", "about"];
 
   const pageStyle = "opacity-50 hover:opacity-80";
   const pageStyleActive = "opacity-100 hover:opacity-100";

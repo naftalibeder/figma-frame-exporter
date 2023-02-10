@@ -5,6 +5,7 @@
   import { log } from "utils";
   import ConfigurePage from "./pages/ConfigurePage.svelte";
   import SavedPage from "./pages/SavedPage.svelte";
+  import AboutPage from "./pages/AboutPage.svelte";
   import Nav from "./components/Nav.svelte";
   import Divider from "./components/Divider.svelte";
   import "../styles/main.css";
@@ -45,6 +46,8 @@
         <ConfigurePage />
       {:else if currentPage === "saved"}
         <SavedPage />
+      {:else if currentPage === "about"}
+        <AboutPage />
       {/if}
     </div>
   {/if}
