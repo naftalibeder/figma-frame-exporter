@@ -6,17 +6,17 @@
   export let configs: Record<string, Config>;
   export let onChange: (id: string) => void;
 
-  let configOptions: ConfigOption[] = Object.entries(configs).map(([id, config]) => {
-    return {
-      value: id,
-      label: config.name === "" ? "(No name)" : config.name,
-      group: null,
-      selected: false,
-    };
-  });
+  $: configsSorted = Object.values(configs).sort((a, b) => a.index - b.index);
+
+  let configOptions: ConfigOption[] = [];
   $: {
-    configOptions.forEach((o, i) => {
-      configOptions[i].selected = o.value === selectedConfigId;
+    configOptions = configsSorted.map((config, i) => {
+      return {
+        value: config.id,
+        label: config.name === "" ? "(No name)" : config.name,
+        group: null,
+        selected: config.id === selectedConfigId,
+      };
     });
   }
 </script>

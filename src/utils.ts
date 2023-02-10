@@ -86,10 +86,11 @@ export const buildExportSettings = (config: {
   }
 };
 
-export const buildDefaultConfig = (): Config => {
+export const buildDefaultConfig = (index: number): Config => {
   return {
     id: `${Math.random()}`,
     name: "",
+    index,
     syntax: "$F$V",
     connectors: {
       before: "",

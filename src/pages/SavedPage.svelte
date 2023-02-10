@@ -1,12 +1,15 @@
 <script lang="ts" type="module">
+  import { onMount } from "svelte";
   import { Type, Section, Icon, IconPlus, Input } from "figma-plugin-ds-svelte";
   import { store } from "store";
   import { buildDefaultConfig, log } from "utils";
   import SavedConfigItem from "../components/SavedConfigItem.svelte";
   import Divider from "../components/Divider.svelte";
-  import { onMount } from "svelte";
 
   $: configKeys = Object.keys($store.configs);
+  $: configsSorted = Object.values($store.configs).sort((a, b) => a.index - b.index);
+  $: maxConfigIndex = configsSorted[-1]?.index ?? 0;
+
   let code = "";
 
   onMount(() => {
@@ -18,7 +21,7 @@
   };
 
   const onSelectAdd = () => {
-    const newConfig = buildDefaultConfig();
+    const newConfig = buildDefaultConfig(maxConfigIndex + 1);
 
     $store.selectedConfigId = newConfig.id;
     $store.configs = {
@@ -30,7 +33,7 @@
   };
 
   const onSelectDuplicate = (id: string) => {
-    const defaultConfig = buildDefaultConfig();
+    const defaultConfig = buildDefaultConfig(maxConfigIndex + 1);
 
     const newConfig = { ...$store.configs[id] };
     newConfig.id = defaultConfig.id;
@@ -43,12 +46,31 @@
     updateCodeFromConfigs();
   };
 
+  const onSelectMove = (id: string, direction: "up" | "down") => {
+    const updatedConfigs = { ...$store.configs };
+
+    const sourceIndex = updatedConfigs[id].index;
+    const targetIndex = updatedConfigs[id].index + (direction === "up" ? -1 : 1);
+
+    const targetId = Object.entries(updatedConfigs).find(([k, v]) => v.index === targetIndex)?.[0];
+    if (targetId === undefined) {
+      return;
+    }
+
+    updatedConfigs[id].index = targetIndex;
+    updatedConfigs[targetId].index = sourceIndex;
+
+    $store.configs = { ...updatedConfigs };
+
+    updateCodeFromConfigs();
+  };
+
   const onSelectDelete = (id: string) => {
     if (configKeys.length > 1) {
       delete $store.configs[id];
       $store.configs = { ...$store.configs };
     } else {
-      const newConfig = buildDefaultConfig();
+      const newConfig = buildDefaultConfig(maxConfigIndex + 1);
 
       $store.selectedConfigId = newConfig.id;
       $store.configs = {
@@ -136,8 +158,8 @@
         </div>
       </div>
       <div class="space-y-4 mt-4">
-        {#each Object.entries($store.configs) as [id, config], index}
-          {#if index > 0}
+        {#each configsSorted as config, i}
+          {#if i > 0}
             <div class="px-2">
               <Divider />
             </div>
@@ -146,11 +168,12 @@
           <div class="pl-2">
             <SavedConfigItem
               {config}
-              isActive={id === $store.selectedConfigId}
-              onSelectActivate={() => onSelectActivate(id)}
-              onChangeConfigName={(name) => onChangeConfigName(id, name)}
-              onSelectDuplicate={() => onSelectDuplicate(id)}
-              onSelectDelete={() => onSelectDelete(id)}
+              isActive={config.id === $store.selectedConfigId}
+              onSelectActivate={() => onSelectActivate(config.id)}
+              onChangeConfigName={(name) => onChangeConfigName(config.id, name)}
+              onSelectDuplicate={() => onSelectDuplicate(config.id)}
+              onSelectMove={(direction) => onSelectMove(config.id, direction)}
+              onSelectDelete={() => onSelectDelete(config.id)}
             />
           </div>
         {/each}
@@ -161,11 +184,11 @@
 
     <div class="section">
       <div class="flex flex-col">
-        <Section>Sharing</Section>
+        <Section>Share configurations</Section>
         <div class="section-subtitle">
           <Type
-            >Copy the code below to share your configurations, or paste a new one. (Warning: this
-            will overwrite your existing configurations!)</Type
+            >Copy the code below to back up or share your configurations, or paste another code to
+            load saved configurations.</Type
           >
         </div>
       </div>

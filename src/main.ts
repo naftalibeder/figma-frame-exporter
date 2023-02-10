@@ -18,7 +18,7 @@ figma.showUI(__html__, { width: 360, height: 900, themeColors: true });
 const STORE_NAME = "store";
 
 const defaultStore: Store = (() => {
-  const initialConfig = buildDefaultConfig();
+  const initialConfig = buildDefaultConfig(0);
 
   return {
     selectedConfigId: initialConfig.id,
@@ -39,6 +39,12 @@ const getStore = async (): Promise<Store> => {
   } catch (e) {
     store = defaultStore;
     log("Error getting store:", e);
+  }
+
+  // Migrate order indices if needed.
+  const configEntries = Object.entries(store.configs);
+  if (configEntries.some(([k, v]) => v.index === undefined)) {
+    configEntries.forEach(([k, v], i) => (store.configs[k].index = i));
   }
 
   return store;

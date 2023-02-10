@@ -41,6 +41,7 @@ export type LayerProperty = typeof layerProperties[number];
 export interface Config extends NameConfig, ImageConfig, LayerModConfig {
   id: string;
   name: string;
+  index: number;
 }
 
 export interface NameConfig {

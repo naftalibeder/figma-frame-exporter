@@ -8,6 +8,7 @@
   export let onSelectActivate: () => void;
   export let onChangeConfigName: (name: string) => void;
   export let onSelectDuplicate: () => void;
+  export let onSelectMove: (direction: "up" | "down") => void;
   export let onSelectDelete: () => void;
 
   let isEditingName = false;
@@ -103,20 +104,31 @@
         {/each}
       </div>
       <div class="flex flex-row space-x-2">
+        <div class="flex flex-row space-x-1">
+          <Type>
+            <div
+              class={"flex w-fit text-gray-400 cursor-pointer"}
+              on:click={() => onSelectMove("down")}
+            >
+              ↓
+            </div>
+          </Type>
+          <Type>
+            <div
+              class={"flex w-fit text-gray-400 cursor-pointer"}
+              on:click={() => onSelectMove("up")}
+            >
+              ↑
+            </div>
+          </Type>
+        </div>
         <Type>
           <div
-            class={"flex w-fit cursor-pointer " + (isActive ? "text-blue-400" : "text-gray-400")}
+            class={"flex w-fit cursor-pointer " +
+              (isActive ? "text-blue-400 font-bold" : "text-gray-400")}
             on:click={onSelectActivate}
           >
             {isActive ? "Active" : "Activate"}
-          </div>
-        </Type>
-        <Type>
-          <div
-            class={"flex w-fit text-gray-400 cursor-pointer"}
-            on:click={() => (isEditingName = true)}
-          >
-            Edit name
           </div>
         </Type>
         <Type>
