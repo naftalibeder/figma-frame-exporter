@@ -37,8 +37,8 @@
         <Section>Support</Section>
         <div class="section-subtitle">
           <Type
-            >If you find Mock useful and want to show your support, please consider telling someone
-            else about it, clicking the heart icon on its <a
+            >If you find Frame Exporter useful and want to show your support, please consider
+            telling someone else about it, clicking the heart icon on its <a
               href="https://www.figma.com/community/plugin/1074101625913782131"
               target="_blank"
             >
