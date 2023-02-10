@@ -1,3 +1,8 @@
+# 14
+
+- Added ability to reorder configurations
+- Added about page with project information and a donation link :)
+
 # 13
 
 - Added ability to save and load configurations from a shareable code
