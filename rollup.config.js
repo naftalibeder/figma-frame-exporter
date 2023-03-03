@@ -22,7 +22,6 @@ export default [
     },
     plugins: [
       svelte({
-        dev: !production,
         preprocess: sveltePreprocess({
           sourceMap: !production,
           postcss: {
