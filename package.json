@@ -10,7 +10,7 @@
   "author": "Naftali Beder",
   "license": "MIT",
   "devDependencies": {
-    "@figma/plugin-typings": "1.50.0",
+    "@figma/plugin-typings": "1.58.0",
     "@rollup/plugin-alias": "3.1.9",
     "@rollup/plugin-commonjs": "22.0.2",
     "@rollup/plugin-image": "2.1.1",
@@ -20,7 +20,8 @@
     "caniuse-lite": "1.0.30001378",
     "cssnano": "5.1.13",
     "figma-plugin-ds": "1.0.1",
-    "figma-plugin-ds-svelte": "github:naftalibeder/figma-plugin-ds-svelte#fix/select-menu-clip",
+    "figma-plugin-ds-svelte": "github:naftalibeder/figma-plugin-ds-svelte#prod",
+    "postcss": "8.4.16",
     "rollup": "2.78.0",
     "rollup-plugin-html-bundle": "0.0.3",
     "rollup-plugin-livereload": "2.0.5",
@@ -31,10 +32,9 @@
     "sirv-cli": "2.0.2",
     "svelte": "3.49.0",
     "svelte-preprocess": "4.10.7",
+    "tailwindcss": "3.1.8",
     "tslib": "2.4.0",
-    "typescript": "4.7.4",
-    "postcss": "8.4.16",
-    "tailwindcss": "3.1.8"
+    "typescript": "4.7.4"
   },
   "dependencies": {
     "js-convert-case": "4.2.0",
