@@ -2,6 +2,7 @@
   import { Type, Icon, Input, IconMinus } from "figma-plugin-ds-svelte";
   import { toSentenceCase } from "js-convert-case";
   import { Config } from "types";
+  import Tag from "./Tag.svelte";
 
   export let config: Config;
   export let isActive: boolean;
@@ -27,12 +28,8 @@
       parts.push(`${config.layerMods.length} modification${plural}`);
     }
 
-    if (config.connectors.before !== "") {
-      parts.push(`Prefix ${config.connectors.before}`);
-    }
-
-    if (config.connectors.after !== "") {
-      parts.push(`Suffix ${config.connectors.after}`);
+    if (config.connector !== "") {
+      parts.push(`Connector ${config.connector}`);
     }
 
     descriptionTags = parts;
@@ -96,11 +93,7 @@
       {/if}
       <div class="flex flex-row items-center flex-wrap">
         {#each descriptionTags as tag}
-          <div
-            class="flex h-fit px-1 py-0.5 mt-2 mr-2 outline outline-1 outline-black rounded-md whitespace-nowrap"
-          >
-            <Type>{tag}</Type>
-          </div>
+          <Tag>{tag}</Tag>
         {/each}
       </div>
       <div class="flex flex-row space-x-2">

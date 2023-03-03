@@ -5,12 +5,6 @@ export type Store = {
 
 export type Page = "configure" | "saved" | "about";
 
-export type Connectors = {
-  before: string;
-  between: string;
-  after: string;
-};
-
 export const casingStrings = [
   "original",
   "lower",
@@ -46,8 +40,8 @@ export interface Config extends NameConfig, ImageConfig, LayerModConfig {
 
 export interface NameConfig {
   syntax: string;
-  connectors: Connectors;
   casing: Casing;
+  connector: string;
 }
 
 export interface ImageConfig {
@@ -99,7 +93,8 @@ export interface LayerMod {
   value?: any;
 }
 
-export interface Variant {
+export interface VariantInstance {
+  type: "text" | "boolean";
   property: string;
   value: string;
 }
@@ -107,7 +102,7 @@ export interface Variant {
 export interface Exportable {
   id: string;
   parentName: string;
-  variants: Variant[];
+  variants: VariantInstance[];
   size: Size;
 }
 
@@ -128,7 +123,6 @@ export type LayerModMatches = Record<string, number>;
 
 export interface ExportPayload {
   nodeCount: number;
-  hasVariants: boolean;
   layerModMatches: LayerModMatches;
   assets: Asset[];
 }

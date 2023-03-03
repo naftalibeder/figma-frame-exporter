@@ -1,6 +1,6 @@
 import {
   Exportable,
-  Variant,
+  VariantInstance,
   Config,
   Asset,
   PreviewSettings,
@@ -41,11 +41,22 @@ const getStore = async (): Promise<Store> => {
     log("Error getting store:", e);
   }
 
-  // Migrate order indices if needed.
   const configEntries = Object.entries(store.configs);
+  // Migrate order indices if needed.
   if (configEntries.some(([k, v]) => v.index === undefined)) {
-    configEntries.forEach(([k, v], i) => (store.configs[k].index = i));
+    configEntries.forEach(([k, v], i) => {
+      store.configs[k].index = i;
+    });
   }
+
+  // Migrate connectors if needed.
+  configEntries.forEach(([k, v], i) => {
+    if (v["connectors"]) {
+      const connector = v["connectors"]["between"];
+      store.configs[k].connector = connector;
+      delete store.configs[k]["connectors"];
+    }
+  });
 
   return store;
 };
@@ -93,25 +104,36 @@ const getExportables = (): Exportable[] => {
 
   for (const node of nodes) {
     if (node.type === "COMPONENT_SET") {
-      const children = node.children;
+      const children = node.children as ComponentNode[];
+
+      // Normalize each variant property type.
+      const variantPropertyTypes: Record<string, "text" | "boolean"> = {};
+      Object.entries(node.componentPropertyDefinitions).forEach(([k, v]) => {
+        const options = new Set(v.variantOptions);
+        const isBool = options.size === 2 && options.has("true") && options.has("false");
+        variantPropertyTypes[k] = isBool ? "boolean" : "text";
+      });
+      log("Variant property types:", variantPropertyTypes);
 
       for (const child of children) {
-        const pairs = child.name.split(", ");
-
-        let variants: Variant[] = [];
-        for (const pair of pairs) {
-          const [property, value] = pair.split("=");
-          variants.push({
-            property,
-            value,
-          });
-        }
+        const variantProperties = child.variantProperties;
+        let variants: VariantInstance[] = Object.entries(variantProperties).map(([k, v]) => {
+          return {
+            type: variantPropertyTypes[k],
+            property: k,
+            value: v,
+          };
+        });
+        log("Variant instances:", variants);
 
         exportables.push({
           id: child.id,
           parentName: node.name,
           variants,
-          size: { width: child.width, height: child.height },
+          size: {
+            width: child.width,
+            height: child.height,
+          },
         });
       }
     } else if (node.type === "FRAME" || node.type === "COMPONENT" || node.type === "GROUP") {
@@ -119,7 +141,10 @@ const getExportables = (): Exportable[] => {
         id: node.id,
         parentName: node.name,
         variants: [],
-        size: { width: node.width, height: node.height },
+        size: {
+          width: node.width,
+          height: node.height,
+        },
       });
     }
   }
@@ -132,11 +157,9 @@ const getExportPayload = async (
   config: Config,
   previewSettings: PreviewSettings
 ): Promise<ExportPayload> => {
-  const { syntax, connectors, casing, extension, sizeConstraint, layerMods } = config;
+  const { syntax, connector, casing, extension, sizeConstraint, layerMods } = config;
 
   tempFrame.create();
-
-  let hasVariants = false;
 
   let layerModMatches: LayerModMatches = {};
   for (const layerMod of layerMods) {
@@ -164,35 +187,44 @@ const getExportPayload = async (
       layerModMatches[layerMod.id] += payload.matchedNodeCount;
     }
 
-    // Build concatenated variants part of filename.
-    let variantsStr = "";
-    e.variants.forEach((variant, i) => {
-      if (!variant.value) {
-        console.error("Variant error:", variant);
+    // Build part of filename based on existing variants.
+    let variantsPart = "";
+    let displayedIndex = 0;
+    e.variants.forEach((variant) => {
+      let part = variant.value;
+
+      // If variant is boolean, show property name (instead of value) when value
+      // is `true`, nothing when value is `false`.
+      if (variant.type === "boolean") {
+        part = variant.value === "true" ? variant.property : "";
+      }
+
+      if (part === "") {
         return;
       }
 
-      const value = withCasing(variant.value, casing);
-      if (i > 0) {
-        variantsStr += `${connectors.between}${value}`;
+      part = withCasing(part, casing);
+
+      if (displayedIndex > 0) {
+        variantsPart = `${variantsPart}${connector}${part}`;
       } else {
-        variantsStr += value;
+        variantsPart = part;
       }
+
+      displayedIndex += 1;
     });
-    if (variantsStr.length > 0) {
-      hasVariants = true;
-    }
-    if (connectors.before.length > 0) {
-      variantsStr = connectors.before + variantsStr;
-    }
-    if (connectors.after.length > 0) {
-      variantsStr = variantsStr + connectors.after;
-    }
+
+    const parentNamePart = withCasing(e.parentName, casing);
 
     // Build full filename.
-    const filename = syntax
-      .replace("$F", withCasing(e.parentName, casing))
-      .replace("$V", variantsStr);
+    const replacements = [
+      ["$F", parentNamePart],
+      ["$V", variantsPart],
+    ];
+    let filename = syntax;
+    replacements.forEach(([slug, display]) => {
+      filename = filename.split(slug).join(display);
+    });
     asset.filename = filename;
 
     // Generate image data.
@@ -228,7 +260,7 @@ const getExportPayload = async (
 
   tempFrame.remove();
 
-  return { nodeCount: exportables.length, hasVariants, layerModMatches, assets };
+  return { nodeCount: exportables.length, layerModMatches, assets };
 };
 
 const withLayerMods = (
@@ -241,7 +273,7 @@ const withLayerMods = (
   const { property, value } = layerMod;
 
   let matchedNodes: SceneNode[] = [];
-  if (query?.length > 0) {
+  if (query && query.length > 0) {
     matchedNodes = node.findAll((o) => {
       try {
         const m = o.name.match(query) !== null;
