@@ -1,3 +1,8 @@
+# 15
+
+- Updated filename generation to include boolean variant names only when true
+- Simplified filename variant connectors into single field
+
 # 14
 
 - Added ability to reorder configurations
