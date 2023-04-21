@@ -178,8 +178,9 @@
     </div>
   </div>
 
-  <div
-    class="flex flex-col justify-center w-full h-16 bg-white cursor-pointer"
+  <button
+    class="flex flex-col justify-center w-full h-16"
+    style="background-color: var(--figma-color-bg)"
     disabled={exportButtonDisabled}
     on:click={onSelectExport}
   >
@@ -194,5 +195,5 @@
       </Type>
       <Icon iconName={IconForward} />
     </div>
-  </div>
+  </button>
 </div>

@@ -5,6 +5,7 @@
   import { buildDefaultConfig, log } from "utils";
   import SavedConfigItem from "../components/SavedConfigItem.svelte";
   import Divider from "../components/Divider.svelte";
+  import IconButton from "../components/IconButton.svelte";
 
   $: configKeys = Object.keys($store.configs);
   $: configsSorted = Object.values($store.configs).sort((a, b) => a.index - b.index);
@@ -151,11 +152,7 @@
             >
           </div>
         </div>
-        <div class="flex items-start" on:click={() => onSelectAdd()}>
-          <div class="flex rounded-md hover:bg-gray-100">
-            <Icon iconName={IconPlus} />
-          </div>
-        </div>
+        <IconButton iconName={IconPlus} onClick={onSelectAdd} />
       </div>
       <div class="space-y-4 mt-4">
         {#each configsSorted as config, i}

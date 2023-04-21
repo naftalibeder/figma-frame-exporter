@@ -3,6 +3,7 @@
   import { toSentenceCase } from "js-convert-case";
   import { Config } from "types";
   import Tag from "./Tag.svelte";
+  import IconButton from "./IconButton.svelte";
 
   export let config: Config;
   export let isActive: boolean;
@@ -132,9 +133,5 @@
       </div>
     </div>
   </div>
-  <div class="flex items-start" on:click={onSelectDelete}>
-    <div class="flex rounded-md hover:bg-gray-100">
-      <Icon iconName={IconMinus} />
-    </div>
-  </div>
+  <IconButton iconName={IconMinus} onClick={onSelectDelete} />
 </div>

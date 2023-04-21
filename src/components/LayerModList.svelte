@@ -2,8 +2,9 @@
   import { Type, Section, Icon, IconPlus } from "figma-plugin-ds-svelte";
   import { LayerMod, LayerModMatches } from "types";
   import { log, randomId } from "utils";
-  import Divider from "./Divider.svelte";
   import LayerModItem from "./LayerModItem.svelte";
+  import IconButton from "./IconButton.svelte";
+  import Divider from "./Divider.svelte";
 
   export let layerMods: LayerMod[];
   export let layerModMatches: LayerModMatches;
@@ -23,18 +24,14 @@
         >
       </div>
     </div>
-    <div
-      class="flex items-start"
-      on:click={() => {
+    <IconButton
+      iconName={IconPlus}
+      onClick={() => {
         const mods = [...layerMods];
         mods.push({ id: randomId() });
         onChangeLayerMods(mods);
       }}
-    >
-      <div class="flex rounded-md hover:bg-gray-100">
-        <Icon iconName={IconPlus} />
-      </div>
-    </div>
+    />
   </div>
   {#if layerMods.length > 0}
     <div class="space-y-4 mt-4">

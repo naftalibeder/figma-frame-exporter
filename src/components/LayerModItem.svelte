@@ -1,6 +1,7 @@
 <script lang="ts" type="module">
-  import { Type, Icon, Input, IconMinus, SelectMenu } from "figma-plugin-ds-svelte";
+  import { Type, Input, IconMinus, SelectMenu } from "figma-plugin-ds-svelte";
   import { LayerMod, layerProperties, LayerProperty, LayerPropertyOption } from "types";
+  import IconButton from "./IconButton.svelte";
 
   export let layerMod: LayerMod;
   export let matchedNodeCount: number;
@@ -79,9 +80,5 @@
       </div>
     </div>
   </div>
-  <div class="flex items-start" on:click={onSelectDelete}>
-    <div class="flex rounded-md hover:bg-gray-100">
-      <Icon iconName={IconMinus} />
-    </div>
-  </div>
+  <IconButton iconName={IconMinus} onClick={onSelectDelete} />
 </div>
