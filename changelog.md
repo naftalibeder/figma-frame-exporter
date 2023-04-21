@@ -1,3 +1,7 @@
+# 16
+
+- Fixed some colors appearing incorrectly in dark mode
+
 # 15
 
 - Updated filename generation to include boolean variant names only when true
