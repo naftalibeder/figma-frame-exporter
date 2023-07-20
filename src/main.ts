@@ -42,6 +42,7 @@ const getStore = async (): Promise<Store> => {
   }
 
   const configEntries = Object.entries(store.configs);
+
   // Migrate order indices if needed.
   if (configEntries.some(([k, v]) => v.index === undefined)) {
     configEntries.forEach(([k, v], i) => {

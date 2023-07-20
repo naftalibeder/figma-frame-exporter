@@ -1,11 +1,12 @@
 <script lang="ts" type="module">
   import { onMount } from "svelte";
-  import { Type, Section, Icon, IconPlus, Input } from "figma-plugin-ds-svelte";
+  import { Type, Section, IconPlus, Input } from "figma-plugin-ds-svelte";
   import { store } from "store";
   import { buildDefaultConfig, log } from "utils";
   import SavedConfigItem from "../components/SavedConfigItem.svelte";
   import Divider from "../components/Divider.svelte";
   import IconButton from "../components/IconButton.svelte";
+  import { Store } from "types";
 
   $: configKeys = Object.keys($store.configs);
   $: configsSorted = Object.values($store.configs).sort((a, b) => a.index - b.index);
@@ -101,12 +102,12 @@
       const configsBase64 = btoa(configsStr);
       code = configsBase64;
     } catch (e) {
-      alert(`Cannot generate code: ${e}`);
+      console.error("Error generating code:", e);
     }
   };
 
   const updateConfigsFromCode = (updatedCode: string) => {
-    if (updatedCode === "" || updatedCode === code) {
+    if (updatedCode === "") {
       return;
     }
 
@@ -115,9 +116,16 @@
 
     try {
       const configsStr = atob(code);
-      const configs = JSON.parse(configsStr);
+      const configs = JSON.parse(configsStr) as Store["configs"];
+      if (Object.keys(configs).length === 0) {
+        throw "No configs found";
+      }
+
       $store.configs = configs;
-    } catch (e) {}
+      $store.selectedConfigId = Object.values(configs)[0].id;
+    } catch (e) {
+      console.error("Error parsing code:", e);
+    }
   };
 
   const onCodeInputFocus = (e: FocusEvent) => {
