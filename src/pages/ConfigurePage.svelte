@@ -174,7 +174,7 @@
     <Divider />
 
     <div class="section">
-      <OutputPreview {exampleAssets} />
+      <OutputPreview totalNodeCt={nodeCount} {exampleAssets} />
     </div>
   </div>
 

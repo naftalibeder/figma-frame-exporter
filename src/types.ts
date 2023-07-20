@@ -16,7 +16,7 @@ export const casingStrings = [
   "pascal",
   "dot",
 ] as const;
-export type Casing = typeof casingStrings[number];
+export type Casing = (typeof casingStrings)[number];
 
 export type Extension = "PNG" | "JPG" | "SVG" | "PDF";
 export type ConstraintType = "SCALE" | "WIDTH" | "HEIGHT";
@@ -30,7 +30,7 @@ export const layerProperties = [
   "cornerRadius",
   "strokeWeight",
 ] as const;
-export type LayerProperty = typeof layerProperties[number];
+export type LayerProperty = (typeof layerProperties)[number];
 
 export interface Config extends NameConfig, ImageConfig, LayerModConfig {
   id: string;
@@ -117,6 +117,7 @@ export interface Asset {
 export interface PreviewSettings {
   isFinal: boolean;
   thumbSize?: Size;
+  limitCt?: number;
 }
 
 export type LayerModMatches = Record<string, number>;

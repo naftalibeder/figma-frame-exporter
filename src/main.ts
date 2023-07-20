@@ -159,6 +159,7 @@ const getExportPayload = async (
   previewSettings: PreviewSettings
 ): Promise<ExportPayload> => {
   const { syntax, connector, casing, extension, sizeConstraint, layerMods } = config;
+  const { isFinal, thumbSize, limitCt } = previewSettings;
 
   tempFrame.create();
 
@@ -167,9 +168,16 @@ const getExportPayload = async (
     layerModMatches[layerMod.id] = 0;
   }
 
+  let exportablesToUse: Exportable[];
+  if (limitCt !== undefined) {
+    exportablesToUse = exportables.slice(0, limitCt);
+  } else {
+    exportablesToUse = exportables.slice();
+  }
+
   let assets: Asset[] = [];
 
-  for (const e of exportables) {
+  for (const e of exportablesToUse) {
     const asset: Asset = {
       filename: "",
       extension,
@@ -235,7 +243,7 @@ const getExportPayload = async (
       srcSize: e.size,
     };
     let settings: ExportSettings;
-    if (previewSettings.isFinal) {
+    if (isFinal) {
       const payload = buildExportSettings(baseExportConfig);
       settings = payload.settings;
     } else {
@@ -244,7 +252,7 @@ const getExportPayload = async (
       const payload = buildExportSettings({
         extension: "PNG",
         constraint: "",
-        srcSize: previewSettings.thumbSize,
+        srcSize: thumbSize,
       });
       settings = payload.settings;
     }
@@ -319,8 +327,8 @@ const refreshPreview = (config: Config | undefined) => {
   previewTimer = setTimeout(() => _refreshPreview(config), 200);
 };
 
-const _refreshPreview = async (config: Config | undefined, limit: number = 20) => {
-  const exportables = getExportables().slice(0, limit);
+const _refreshPreview = async (config: Config | undefined) => {
+  const exportables = getExportables();
 
   log("Exportables:", exportables);
 
@@ -330,6 +338,7 @@ const _refreshPreview = async (config: Config | undefined, limit: number = 20) =
       exportPayload = await getExportPayload(exportables, config, {
         isFinal: false,
         thumbSize: { width: 32, height: 32 },
+        limitCt: 20,
       });
     } catch (e) {
       console.error("Preview error:", e);
