@@ -1,3 +1,8 @@
+# 17
+
+- Fixed bug causing the export button to show an incorrect image count
+- Fixed potential crash when pasting in a new saved-configurations code
+
 # 16
 
 - Fixed some colors appearing incorrectly in dark mode
