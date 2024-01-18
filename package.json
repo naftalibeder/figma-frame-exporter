@@ -9,7 +9,9 @@
   },
   "author": "Naftali Beder",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
+    "js-convert-case": "4.2.0",
+    "jszip": "3.9.1",
     "@figma/plugin-typings": "1.58.0",
     "@rollup/plugin-alias": "3.1.9",
     "@rollup/plugin-commonjs": "22.0.2",
@@ -19,7 +21,6 @@
     "@rollup/plugin-typescript": "8.3.4",
     "autoprefixer": "10.4.7",
     "cssnano": "5.1.13",
-    "figma-plugin-ds": "1.0.1",
     "figma-plugin-ds-svelte": "github:naftalibeder/figma-plugin-ds-svelte#prod",
     "postcss": "8.4.16",
     "rollup": "2.78.0",
@@ -34,9 +35,5 @@
     "tailwindcss": "3.1.8",
     "tslib": "2.4.0",
     "typescript": "4.7.4"
-  },
-  "dependencies": {
-    "js-convert-case": "4.2.0",
-    "jszip": "3.9.1"
   }
 }
