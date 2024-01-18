@@ -1,3 +1,7 @@
+# 18
+
+- Maintenance update
+
 # 17
 
 - Fixed bug causing the export button to show an incorrect image count
