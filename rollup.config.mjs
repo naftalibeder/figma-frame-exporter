@@ -8,6 +8,8 @@ import typescript from "@rollup/plugin-typescript";
 import sveltePreprocess from "svelte-preprocess";
 import htmlBundle from "rollup-plugin-html-bundle";
 import postcss from "rollup-plugin-postcss";
+import tailwindcss from "tailwindcss";
+import autoprefixer from "autoprefixer";
 import childProcess from "child_process";
 
 const production = !process.env.ROLLUP_WATCH;
@@ -25,7 +27,7 @@ export default [
         preprocess: sveltePreprocess({
           sourceMap: !production,
           postcss: {
-            plugins: [require("tailwindcss"), require("autoprefixer")],
+            plugins: [tailwindcss, autoprefixer],
           },
         }),
         compilerOptions: {
