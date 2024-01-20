@@ -1,7 +1,7 @@
 <script lang="ts" type="module">
   import { Type, Icon, Input, IconMinus } from "figma-plugin-ds-svelte";
   import { toSentenceCase } from "js-convert-case";
-  import { Config } from "types";
+  import { Config } from "../types";
   import Tag from "./Tag.svelte";
   import IconButton from "./IconButton.svelte";
 
@@ -75,7 +75,8 @@
       {#if !isEditingName}
         <Type>
           <div
-            class={"cursor-pointer " + (config.name.length === 0 ? "text-gray-400" : "")}
+            class={"cursor-pointer " +
+              (config.name.length === 0 ? "text-gray-400" : "")}
             on:click={onNameLabelClick}
           >
             {config.name.length === 0 ? "(No name)" : config.name}
@@ -126,7 +127,10 @@
           </div>
         </Type>
         <Type>
-          <div class={"flex w-fit text-gray-400 cursor-pointer"} on:click={onSelectDuplicate}>
+          <div
+            class={"flex w-fit text-gray-400 cursor-pointer"}
+            on:click={onSelectDuplicate}
+          >
             Duplicate
           </div>
         </Type>

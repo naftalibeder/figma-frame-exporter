@@ -1,6 +1,6 @@
 <script lang="ts" type="module">
   import { Section, SelectMenu, Input } from "figma-plugin-ds-svelte";
-  import { ExtensionOption, ImageConfig } from "types";
+  import { ExtensionOption, ImageConfig } from "../types";
 
   export let imageConfig: ImageConfig;
   export let onChange: (iomageConfig: ImageConfig) => void;

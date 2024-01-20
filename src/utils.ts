@@ -1,4 +1,4 @@
-import convertCase from "../node_modules/js-convert-case/lib/index";
+import convertCase from "js-convert-case";
 
 import { Casing, Config, Extension, Size } from "./types";
 
@@ -107,7 +107,8 @@ export const buildDefaultConfig = (index: number): Config => {
   };
 };
 
-export const delay = async (ms: number) => await new Promise((res) => setTimeout(res, ms));
+export const delay = async (ms: number) =>
+  await new Promise((res) => setTimeout(res, ms));
 
 export const log = (...args: any[]) => {
   console.log("[Frame Exporter]", ...args);

@@ -1,15 +1,17 @@
 <script lang="ts" type="module">
   import { onMount } from "svelte";
   import { Type, Section, IconPlus, Input } from "figma-plugin-ds-svelte";
-  import { store } from "store";
-  import { buildDefaultConfig, log } from "utils";
+  import { store } from "../store";
+  import { buildDefaultConfig, log } from "../utils";
   import SavedConfigItem from "../components/SavedConfigItem.svelte";
   import Divider from "../components/Divider.svelte";
   import IconButton from "../components/IconButton.svelte";
-  import { Store } from "types";
+  import { Store } from "../types";
 
   $: configKeys = Object.keys($store.configs);
-  $: configsSorted = Object.values($store.configs).sort((a, b) => a.index - b.index);
+  $: configsSorted = Object.values($store.configs).sort(
+    (a, b) => a.index - b.index
+  );
   $: maxConfigIndex = configsSorted[-1]?.index ?? 0;
 
   let code = "";
@@ -52,9 +54,12 @@
     const updatedConfigs = { ...$store.configs };
 
     const sourceIndex = updatedConfigs[id].index;
-    const targetIndex = updatedConfigs[id].index + (direction === "up" ? -1 : 1);
+    const targetIndex =
+      updatedConfigs[id].index + (direction === "up" ? -1 : 1);
 
-    const targetId = Object.entries(updatedConfigs).find(([k, v]) => v.index === targetIndex)?.[0];
+    const targetId = Object.entries(updatedConfigs).find(
+      ([k, v]) => v.index === targetIndex
+    )?.[0];
     if (targetId === undefined) {
       return;
     }
@@ -155,8 +160,8 @@
           <Section>Saved configurations</Section>
           <div class="section-subtitle">
             <Type
-              >{configKeys.length} saved. You can add a new configuration, or activate an existing one
-              to edit.</Type
+              >{configKeys.length} saved. You can add a new configuration, or activate
+              an existing one to edit.</Type
             >
           </div>
         </div>
@@ -192,8 +197,8 @@
         <Section>Share configurations</Section>
         <div class="section-subtitle">
           <Type
-            >Copy the code below to back up or share your configurations, or paste another code to
-            load saved configurations.</Type
+            >Copy the code below to back up or share your configurations, or
+            paste another code to load saved configurations.</Type
           >
         </div>
       </div>

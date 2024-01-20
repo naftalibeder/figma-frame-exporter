@@ -1,4 +1,4 @@
-import { writable } from "../node_modules/svelte/store/index";
+import { writable } from "svelte/store";
 import { Store } from "./types";
 
 export const store = writable<Store | undefined>();

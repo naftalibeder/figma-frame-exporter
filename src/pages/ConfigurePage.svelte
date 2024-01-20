@@ -2,9 +2,9 @@
   import { onMount } from "svelte";
   import { Type, Icon, IconForward } from "figma-plugin-ds-svelte";
   import JSZip from "../../node_modules/jszip/dist/jszip.min.js";
-  import { store } from "store";
-  import { delay, log } from "utils";
-  import { Asset, Config, ExportPayload, LayerModMatches } from "types";
+  import { store } from "../store";
+  import { delay, log } from "../utils";
+  import { Asset, Config, ExportPayload, LayerModMatches } from "../types";
   import Divider from "../components/Divider.svelte";
   import SelectedConfigOptions from "../components/SelectedConfigOptions.svelte";
   import NameOptions from "../components/NameOptions.svelte";
@@ -188,7 +188,9 @@
 
     <div
       class={"flex flex-1 flex-row items-center justify-between pl-4 pr-2 pointer-events-none " +
-        (exportButtonDisabled ? "opacity-50 hover:opacity-60" : "opacity-80 hover:opacity-100")}
+        (exportButtonDisabled
+          ? "opacity-50 hover:opacity-60"
+          : "opacity-80 hover:opacity-100")}
     >
       <Type weight="bold">
         {exportLoading ? "Generating export..." : `Export ${nodeCount} images`}

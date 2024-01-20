@@ -1,8 +1,8 @@
 <script lang="ts" type="module">
   import { Section, SelectMenu, Input } from "figma-plugin-ds-svelte";
   import { toSentenceCase } from "js-convert-case";
-  import { CasingOption, casingStrings, NameConfig } from "types";
-  import { casingMap } from "utils";
+  import { CasingOption, casingStrings, NameConfig } from "../types";
+  import { casingMap } from "../utils";
   import Tag from "./Tag.svelte";
 
   export let nameConfig: NameConfig;

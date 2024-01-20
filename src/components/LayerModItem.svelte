@@ -1,6 +1,11 @@
 <script lang="ts" type="module">
   import { Type, Input, IconMinus, SelectMenu } from "figma-plugin-ds-svelte";
-  import { LayerMod, layerProperties, LayerProperty, LayerPropertyOption } from "types";
+  import {
+    LayerMod,
+    layerProperties,
+    LayerProperty,
+    LayerPropertyOption,
+  } from "../types";
   import IconButton from "./IconButton.svelte";
 
   export let layerMod: LayerMod;
@@ -16,7 +21,12 @@
   let layerPropertyOptions: LayerPropertyOption[] = [];
   $: {
     const options = layerProperties.map((o) => {
-      return { value: o, label: o, group: null, selected: o === selectedLayerProperty };
+      return {
+        value: o,
+        label: o,
+        group: null,
+        selected: o === selectedLayerProperty,
+      };
     });
     layerPropertyOptions = [
       {
@@ -48,7 +58,10 @@
         />
         <div class="flex flex-1 absolute h-full right-2">
           <div class="flex self-center opacity-40">
-            <Type>{matchedNodeCount} {matchedNodeCount === 1 ? "match" : "matches"}</Type>
+            <Type
+              >{matchedNodeCount}
+              {matchedNodeCount === 1 ? "match" : "matches"}</Type
+            >
           </div>
         </div>
       </div>

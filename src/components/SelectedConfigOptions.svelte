@@ -1,6 +1,6 @@
 <script lang="ts" type="module">
   import { Section, SelectMenu } from "figma-plugin-ds-svelte";
-  import { Config, ConfigOption } from "types";
+  import { Config, ConfigOption } from "../types";
 
   export let selectedConfigId: string;
   export let configs: Record<string, Config>;

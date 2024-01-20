@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "allowJs": true,
+    "checkJs": true,
+    "isolatedModules": true,
+    "typeRoots": ["./node_modules/@figma"]
+  },
+  "include": ["main.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

@@ -2,9 +2,12 @@
   "name": "Frame Exporter",
   "id": "1074101625913782131",
   "api": "1.0.0",
-  "main": "build/main.js",
-  "editorType": [
-    "figma"
-  ],
-  "ui": "build/index.html"
+  "capabilities": [],
+  "enableProposedApi": false,
+  "editorType": ["figma"],
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  },
+  "ui": "dist/index.html",
+  "main": "dist/main.js"
 }

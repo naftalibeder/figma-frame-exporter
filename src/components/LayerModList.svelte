@@ -1,7 +1,7 @@
 <script lang="ts" type="module">
-  import { Type, Section, Icon, IconPlus } from "figma-plugin-ds-svelte";
-  import { LayerMod, LayerModMatches } from "types";
-  import { log, randomId } from "utils";
+  import { Type, Section, IconPlus } from "figma-plugin-ds-svelte";
+  import { LayerMod, LayerModMatches } from "../types";
+  import { randomId } from "../utils";
   import LayerModItem from "./LayerModItem.svelte";
   import IconButton from "./IconButton.svelte";
   import Divider from "./Divider.svelte";
@@ -17,9 +17,9 @@
       <Section>Layer modifiers</Section>
       <div class="section-subtitle">
         <Type
-          >Modify the exported version of any layer. Match text is evaluated as a <a
-            href="https://regex101.com/r/S9wWyf/1"
-            target="_blank">regular expression</a
+          >Modify the exported version of any layer. Match text is evaluated as
+          a <a href="https://regex101.com/r/S9wWyf/1" target="_blank"
+            >regular expression</a
           >.</Type
         >
       </div>

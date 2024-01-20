@@ -8,8 +8,13 @@ import {
   ExportPayload,
   LayerModMatches,
   Store,
-} from "./types";
-import { withCasing, buildExportSettings, log, buildDefaultConfig } from "./utils";
+} from "./src/types";
+import {
+  withCasing,
+  buildExportSettings,
+  log,
+  buildDefaultConfig,
+} from "./src/utils";
 
 figma.showUI(__html__, { width: 360, height: 900, themeColors: true });
 
@@ -111,20 +116,23 @@ const getExportables = (): Exportable[] => {
       const variantPropertyTypes: Record<string, "text" | "boolean"> = {};
       Object.entries(node.componentPropertyDefinitions).forEach(([k, v]) => {
         const options = new Set(v.variantOptions);
-        const isBool = options.size === 2 && options.has("true") && options.has("false");
+        const isBool =
+          options.size === 2 && options.has("true") && options.has("false");
         variantPropertyTypes[k] = isBool ? "boolean" : "text";
       });
       log("Variant property types:", variantPropertyTypes);
 
       for (const child of children) {
         const variantProperties = child.variantProperties;
-        let variants: VariantInstance[] = Object.entries(variantProperties).map(([k, v]) => {
-          return {
-            type: variantPropertyTypes[k],
-            property: k,
-            value: v,
-          };
-        });
+        let variants: VariantInstance[] = Object.entries(variantProperties).map(
+          ([k, v]) => {
+            return {
+              type: variantPropertyTypes[k],
+              property: k,
+              value: v,
+            };
+          }
+        );
         log("Variant instances:", variants);
 
         exportables.push({
@@ -137,7 +145,11 @@ const getExportables = (): Exportable[] => {
           },
         });
       }
-    } else if (node.type === "FRAME" || node.type === "COMPONENT" || node.type === "GROUP") {
+    } else if (
+      node.type === "FRAME" ||
+      node.type === "COMPONENT" ||
+      node.type === "GROUP"
+    ) {
       exportables.push({
         id: node.id,
         parentName: node.name,
@@ -158,7 +170,8 @@ const getExportPayload = async (
   config: Config,
   previewSettings: PreviewSettings
 ): Promise<ExportPayload> => {
-  const { syntax, connector, casing, extension, sizeConstraint, layerMods } = config;
+  const { syntax, connector, casing, extension, sizeConstraint, layerMods } =
+    config;
   const { isFinal, thumbSize, limitCt } = previewSettings;
 
   tempFrame.create();
@@ -315,7 +328,10 @@ const withLayerMods = (
 
       n[property] = _value;
     } catch (e) {
-      log(`Could not assign '${value}' to property '${property}' in layer '${n.name}':`, e);
+      log(
+        `Could not assign '${value}' to property '${property}' in layer '${n.name}':`,
+        e
+      );
     }
   }
 
@@ -357,7 +373,9 @@ const _refreshPreview = async (config: Config | undefined) => {
 
 const generateExport = async (config: Config) => {
   const exportables = getExportables();
-  const exportPayload = await getExportPayload(exportables, config, { isFinal: true });
+  const exportPayload = await getExportPayload(exportables, config, {
+    isFinal: true,
+  });
 
   figma.ui.postMessage({
     type: "EXPORT",
