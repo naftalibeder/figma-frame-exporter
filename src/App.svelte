@@ -20,6 +20,10 @@
 
   window.onmessage = async (event: MessageEvent) => {
     const message = event.data.pluginMessage;
+    if (!message) {
+      return;
+    }
+
     const type = message.type;
     log("Message:", type, message);
 
