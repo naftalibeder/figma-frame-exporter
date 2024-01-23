@@ -1,16 +1,17 @@
 <script lang="ts" type="module">
   import { onMount } from "svelte";
-  import { Type, Icon, IconForward } from "figma-plugin-ds-svelte";
   import JSZip from "../../node_modules/jszip/dist/jszip.min.js";
+  import { Type, Icon, Divider } from "figma-svelte-components";
   import { store } from "../store";
   import { delay, log } from "../utils";
   import { Asset, Config, ExportPayload, LayerModMatches } from "../types";
-  import Divider from "../components/Divider.svelte";
-  import SelectedConfigOptions from "../components/SelectedConfigOptions.svelte";
-  import NameOptions from "../components/NameOptions.svelte";
-  import ImageOptions from "../components/ImageOptions.svelte";
-  import LayerModList from "../components/LayerModList.svelte";
-  import OutputPreview from "../components/OutputPreview.svelte";
+  import {
+    SelectedConfigOptions,
+    NameOptions,
+    ImageOptions,
+    LayerModList,
+    OutputPreview,
+  } from "../components";
 
   let config: Config = $store.configs[$store.selectedConfigId];
 
@@ -192,10 +193,10 @@
           ? "opacity-50 hover:opacity-60"
           : "opacity-80 hover:opacity-100")}
     >
-      <Type weight="bold">
+      <Type weight="weight-bold">
         {exportLoading ? "Generating export..." : `Export ${nodeCount} images`}
       </Type>
-      <Icon iconName={IconForward} />
+      <Icon kind={"forward"} />
     </div>
   </button>
 </div>

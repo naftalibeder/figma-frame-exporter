@@ -1,13 +1,11 @@
 <script lang="ts" type="module">
   import { onMount } from "svelte";
+  import { Divider } from "figma-svelte-components";
   import { Page } from "./types";
   import { store } from "./store";
   import { log } from "./utils";
-  import ConfigurePage from "./pages/ConfigurePage.svelte";
-  import SavedPage from "./pages/SavedPage.svelte";
-  import AboutPage from "./pages/AboutPage.svelte";
-  import Nav from "./components/Nav.svelte";
-  import Divider from "./components/Divider.svelte";
+  import { ConfigurePage, SavedPage, AboutPage } from "./pages";
+  import { Nav } from "./components";
 
   onMount(() => {
     parent.postMessage(

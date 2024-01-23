@@ -1,5 +1,5 @@
 <script lang="ts" type="module">
-  import { Type } from "figma-plugin-ds-svelte";
+  import { Type } from "figma-svelte-components";
 </script>
 
 <div class="flex py-1">

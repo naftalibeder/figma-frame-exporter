@@ -1,12 +1,16 @@
 <script lang="ts" type="module">
   import { onMount } from "svelte";
-  import { Type, Section, IconPlus, Input } from "figma-plugin-ds-svelte";
+  import {
+    Type,
+    Section,
+    Input,
+    IconButton,
+    Divider,
+  } from "figma-svelte-components";
   import { store } from "../store";
   import { buildDefaultConfig, log } from "../utils";
-  import SavedConfigItem from "../components/SavedConfigItem.svelte";
-  import Divider from "../components/Divider.svelte";
-  import IconButton from "../components/IconButton.svelte";
   import { Store } from "../types";
+  import { SavedConfigItem } from "../components";
 
   $: configKeys = Object.keys($store.configs);
   $: configsSorted = Object.values($store.configs).sort(
@@ -158,34 +162,32 @@
       <div class="flex flex-row gap-2 justify-between">
         <div class="flex flex-col">
           <Section>Saved configurations</Section>
-          <div class="section-subtitle">
+          <div>
             <Type
               >{configKeys.length} saved. You can add a new configuration, or activate
               an existing one to edit.</Type
             >
           </div>
         </div>
-        <IconButton iconName={IconPlus} onClick={onSelectAdd} />
+        <IconButton kind={"plus"} onClick={onSelectAdd} />
       </div>
       <div class="space-y-4 mt-4">
         {#each configsSorted as config, i}
           {#if i > 0}
-            <div class="px-2">
+            <div class="pr-2">
               <Divider />
             </div>
           {/if}
 
-          <div class="pl-2">
-            <SavedConfigItem
-              {config}
-              isActive={config.id === $store.selectedConfigId}
-              onSelectActivate={() => onSelectActivate(config.id)}
-              onChangeConfigName={(name) => onChangeConfigName(config.id, name)}
-              onSelectDuplicate={() => onSelectDuplicate(config.id)}
-              onSelectMove={(direction) => onSelectMove(config.id, direction)}
-              onSelectDelete={() => onSelectDelete(config.id)}
-            />
-          </div>
+          <SavedConfigItem
+            {config}
+            isActive={config.id === $store.selectedConfigId}
+            onSelectActivate={() => onSelectActivate(config.id)}
+            onChangeConfigName={(name) => onChangeConfigName(config.id, name)}
+            onSelectDuplicate={() => onSelectDuplicate(config.id)}
+            onSelectMove={(direction) => onSelectMove(config.id, direction)}
+            onSelectDelete={() => onSelectDelete(config.id)}
+          />
         {/each}
       </div>
     </div>
@@ -195,7 +197,7 @@
     <div class="section">
       <div class="flex flex-col">
         <Section>Share configurations</Section>
-        <div class="section-subtitle">
+        <div>
           <Type
             >Copy the code below to back up or share your configurations, or
             paste another code to load saved configurations.</Type
@@ -204,9 +206,8 @@
       </div>
       <div class="space-y-4 mt-4">
         <Input
-          id="code-input"
-          class="flex flex-1"
-          placeholder="Configuration code"
+          className={"flex flex-1"}
+          placeholder={"Configuration code"}
           value={code}
           on:focus={onCodeInputFocus}
           on:keydown={onCodeInputKeyDown}

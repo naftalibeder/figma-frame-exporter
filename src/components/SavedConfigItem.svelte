@@ -1,9 +1,8 @@
 <script lang="ts" type="module">
-  import { Type, Icon, Input, IconMinus } from "figma-plugin-ds-svelte";
+  import { Type, Input, IconButton } from "figma-svelte-components";
   import { toSentenceCase } from "js-convert-case";
   import { Config } from "../types";
-  import Tag from "./Tag.svelte";
-  import IconButton from "./IconButton.svelte";
+  import { Tag } from ".";
 
   export let config: Config;
   export let isActive: boolean;
@@ -15,33 +14,29 @@
 
   let isEditingName = false;
 
-  let descriptionTags: string[] = [];
-  $: {
+  const descriptionTags: string[] = ((_config: Config) => {
     const parts = [
-      config.extension,
-      `${toSentenceCase(config.casing)} casing`,
-      `${config.syntax}`,
-      config.sizeConstraint,
+      _config.extension,
+      `${toSentenceCase(_config.casing)} casing`,
+      `${_config.syntax}`,
+      _config.sizeConstraint,
     ];
 
-    if (config.layerMods.length > 0) {
-      const plural = config.layerMods.length === 1 ? "" : "s";
-      parts.push(`${config.layerMods.length} modification${plural}`);
+    if (_config.layerMods.length > 0) {
+      const plural = _config.layerMods.length === 1 ? "" : "s";
+      parts.push(`${_config.layerMods.length} modification${plural}`);
     }
 
-    if (config.connector !== "") {
-      parts.push(`Connector ${config.connector}`);
+    if (_config.connector !== "") {
+      parts.push(`Connector ${_config.connector}`);
     }
 
-    descriptionTags = parts;
-  }
+    return parts;
+  })(config);
 
   const onNameLabelClick = (e: MouseEvent) => {
     isEditingName = true;
-    setTimeout(() => {
-      const elem = document.getElementById("name-input") as HTMLInputElement;
-      elem.focus();
-    }, 10);
+    // TODO: Focus the input element.
   };
 
   const onNameInputFocus = (e: FocusEvent) => {
@@ -84,7 +79,6 @@
         </Type>
       {:else}
         <Input
-          id={"name-input"}
           bind:value={config.name}
           placeholder="Custom name"
           on:focus={onNameInputFocus}
@@ -137,5 +131,5 @@
       </div>
     </div>
   </div>
-  <IconButton iconName={IconMinus} onClick={onSelectDelete} />
+  <IconButton kind={"minus"} onClick={onSelectDelete} />
 </div>

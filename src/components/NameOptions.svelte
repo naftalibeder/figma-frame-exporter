@@ -1,9 +1,14 @@
 <script lang="ts" type="module">
-  import { Section, SelectMenu, Input } from "figma-plugin-ds-svelte";
   import { toSentenceCase } from "js-convert-case";
-  import { CasingOption, casingStrings, NameConfig } from "../types";
+  import {
+    Section,
+    SelectMenu,
+    Input,
+    type SelectMenuItem,
+  } from "figma-svelte-components";
+  import { Casing, casingStrings, NameConfig } from "../types";
   import { casingMap } from "../utils";
-  import Tag from "./Tag.svelte";
+  import { Tag } from ".";
 
   export let nameConfig: NameConfig;
   export let onChange: (_nameConfig: NameConfig) => void;
@@ -15,21 +20,14 @@
 
   let lastSyntaxCursorIndex = 0;
 
-  let casingOptions: CasingOption[] = casingStrings.map((c) => {
+  let casingOptions: SelectMenuItem<Casing>[] = casingStrings.map((c) => {
     const example = casingMap[c]("quick brown fox");
     const label = `${toSentenceCase(c)} (${example})`;
     return {
-      value: c,
+      id: c,
       label,
-      group: null,
-      selected: false,
     };
   });
-  $: {
-    casingOptions.forEach((o, i) => {
-      casingOptions[i].selected = o.value === nameConfig.casing;
-    });
-  }
 
   const _onChangeConfig = () => {
     onChange(nameConfig);
@@ -54,7 +52,7 @@
           lastSyntaxCursorIndex = e.target["selectionStart"];
         }}
       />
-      <div class="flex flex-row items-center flex-wrap px-2 cursor-pointer">
+      <div class="flex flex-row items-center flex-wrap cursor-pointer">
         {#each syntaxVars as [slug, display]}
           <div
             on:click={() => {
@@ -70,29 +68,29 @@
       </div>
     </div>
 
-    <div class="flex flex-col">
-      <div class="flex flex-row gap-2">
-        <div class="flex flex-col">
-          <Section>Case</Section>
-          <SelectMenu
-            bind:menuItems={casingOptions}
-            on:change={(e) => {
-              nameConfig.casing = e.detail.value;
-              _onChangeConfig();
-            }}
-          />
-        </div>
-        <div class="flex flex-col">
-          <Section>Join variants</Section>
-          <Input
-            placeholder="E.g. -"
-            bind:value={nameConfig.connector}
-            on:input={(e) => {
-              nameConfig.connector = e.target["value"];
-              _onChangeConfig();
-            }}
-          />
-        </div>
+    <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-rows-2">
+        <Section>Case</Section>
+        <SelectMenu
+          items={casingOptions}
+          selectedItemId={nameConfig.casing}
+          placeholder={"Select one"}
+          onChangeSelectedItem={(itemId) => {
+            nameConfig.casing = itemId;
+            _onChangeConfig();
+          }}
+        />
+      </div>
+      <div class="grid grid-rows-2">
+        <Section>Join variants</Section>
+        <Input
+          placeholder="E.g. -"
+          bind:value={nameConfig.connector}
+          on:input={(e) => {
+            nameConfig.connector = e.target["value"];
+            _onChangeConfig();
+          }}
+        />
       </div>
     </div>
   </div>

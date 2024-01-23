@@ -1,8 +1,7 @@
 <script lang="ts" type="module">
-  import { Section, Type } from "figma-plugin-ds-svelte";
+  import { Section, Type, Divider } from "figma-svelte-components";
   import { Asset, Size } from "../types";
-  import Divider from "./Divider.svelte";
-  import EmptyText from "./EmptyText.svelte";
+  import { EmptyText } from ".";
 
   export let totalNodeCt: number;
   export let exampleAssets: Asset[];
@@ -18,7 +17,7 @@
 
 <div>
   <Section>Preview</Section>
-  <div class="section-subtitle">
+  <div>
     {#if exampleAssets.length === 0}
       <Type>Examples of output image files will appear below.</Type>
     {:else if exampleAssets.length < totalNodeCt}
@@ -27,7 +26,7 @@
       <Type>Previewing {exampleAssets.length} images.</Type>
     {/if}
   </div>
-  <div class="mt-2 px-2">
+  <div class="mt-2">
     {#if exampleAssets.length > 0}
       {#each exampleAssets as exampleAsset, index}
         {#if index > 0}
@@ -36,7 +35,7 @@
 
         <div class="flex flex-row content-between items-center gap-2 py-2">
           <img class="w-4 h-4" src={exampleAsset.url} alt="asset thumbnail" />
-          <Type class="flex flex-1 whitespace-nowrap overflow-hidden">
+          <Type className="flex flex-1 whitespace-nowrap overflow-hidden">
             {exampleAsset.filename}.{exampleAsset.extension.toLowerCase()}
           </Type>
           {#if exampleAsset.size}

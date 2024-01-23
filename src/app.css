@@ -7,22 +7,24 @@
   body {
     @apply text-sm;
   }
+
   a {
     @apply text-blue-500 hover:text-blue-400;
   }
+
   .scroll-box {
     @apply flex flex-col overflow-scroll overflow-x-hidden mt-2 py-1 px-2;
   }
+
   .rounded-box {
     @apply outline outline-1 outline-gray-200 rounded-sm;
   }
+
   .rounded-box.error {
     @apply outline-red-500;
   }
+
   .section {
     @apply flex flex-col w-full px-2 pt-2 pb-4;
-  }
-  .section-subtitle {
-    @apply px-2;
   }
 }

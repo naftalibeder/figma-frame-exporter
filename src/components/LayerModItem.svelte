@@ -1,43 +1,30 @@
 <script lang="ts" type="module">
-  import { Type, Input, IconMinus, SelectMenu } from "figma-plugin-ds-svelte";
   import {
-    LayerMod,
-    layerProperties,
-    LayerProperty,
-    LayerPropertyOption,
-  } from "../types";
-  import IconButton from "./IconButton.svelte";
+    Type,
+    Input,
+    SelectMenu,
+    IconButton,
+    type SelectMenuItem,
+  } from "figma-svelte-components";
+  import { LayerMod, layerProperties, LayerProperty } from "../types";
 
   export let layerMod: LayerMod;
   export let matchedNodeCount: number;
   export let onChange: (mod: LayerMod) => void;
   export let onSelectDelete: () => void;
 
-  let selectedLayerProperty: LayerProperty | undefined = undefined;
+  let selectedLayerPropertyId: LayerProperty | undefined = undefined;
   $: {
-    selectedLayerProperty = layerMod.property;
+    selectedLayerPropertyId = layerMod.property;
   }
 
-  let layerPropertyOptions: LayerPropertyOption[] = [];
-  $: {
-    const options = layerProperties.map((o) => {
+  const layerPropertyOptions: SelectMenuItem<LayerProperty>[] =
+    layerProperties.map((o) => {
       return {
-        value: o,
+        id: o,
         label: o,
-        group: null,
-        selected: o === selectedLayerProperty,
       };
     });
-    layerPropertyOptions = [
-      {
-        value: undefined,
-        label: "Select property",
-        group: null,
-        selected: selectedLayerProperty === undefined,
-      },
-      ...options,
-    ];
-  }
 </script>
 
 <div class="flex flex-row space-x-2">
@@ -48,7 +35,7 @@
       </div>
       <div class="flex flex-1 relative">
         <Input
-          class="flex flex-1"
+          className="flex flex-1"
           placeholder="Layers matching..."
           bind:value={layerMod.query}
           on:input={(e) => {
@@ -73,16 +60,18 @@
       <div class="flex flex-1 flex-row items-center gap-2 relative">
         <div class="grow relative">
           <SelectMenu
-            bind:menuItems={layerPropertyOptions}
-            on:change={(e) => {
-              layerMod.property = e.detail.value;
+            items={layerPropertyOptions}
+            selectedItemId={selectedLayerPropertyId}
+            placeholder={"Select property"}
+            onChangeSelectedItem={(itemId) => {
+              layerMod.property = itemId;
               onChange(layerMod);
             }}
           />
         </div>
         <Type>to</Type>
         <Input
-          class="w-[80]"
+          className="w-[80]"
           placeholder="Value"
           bind:value={layerMod.value}
           on:input={(e) => {
@@ -93,5 +82,5 @@
       </div>
     </div>
   </div>
-  <IconButton iconName={IconMinus} onClick={onSelectDelete} />
+  <IconButton kind={"minus"} onClick={onSelectDelete} />
 </div>

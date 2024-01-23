@@ -1,51 +1,51 @@
 <script lang="ts" type="module">
-  import { Section, SelectMenu, Input } from "figma-plugin-ds-svelte";
-  import { ExtensionOption, ImageConfig } from "../types";
+  import {
+    Section,
+    SelectMenu,
+    Input,
+    type SelectMenuItem,
+  } from "figma-svelte-components";
+  import { Extension, ImageConfig } from "../types";
 
   export let imageConfig: ImageConfig;
   export let onChange: (iomageConfig: ImageConfig) => void;
 
-  let extensionOptions: ExtensionOption[] = [
-    { value: "PNG", label: "PNG", group: null, selected: false },
-    { value: "JPG", label: "JPG", group: null, selected: false },
-    { value: "SVG", label: "SVG", group: null, selected: false },
-    { value: "PDF", label: "PDF", group: null, selected: false },
+  const extensionOptions: SelectMenuItem<Extension>[] = [
+    { id: "PNG", label: "PNG" },
+    { id: "JPG", label: "JPG" },
+    { id: "SVG", label: "SVG" },
+    { id: "PDF", label: "PDF" },
   ];
-  $: {
-    extensionOptions.forEach((o, i) => {
-      extensionOptions[i].selected = o.value === imageConfig.extension;
-    });
-  }
 
   const _onChangeConfig = () => {
     onChange(imageConfig);
   };
 </script>
 
-<div class="flex flex-col">
-  <div class="flex flex-row gap-2">
-    <div class="flex flex-col">
-      <Section>Image size</Section>
-      <Input
-        type="text"
-        placeholder="E.g. 2x, 64w, 200h"
-        disabled={!imageConfig.extension || imageConfig.extension === "SVG"}
-        bind:value={imageConfig.sizeConstraint}
-        on:input={(e) => {
-          imageConfig.sizeConstraint = e.target["value"];
-          _onChangeConfig();
-        }}
-      />
-    </div>
-    <div class="flex flex-col">
-      <Section>File type</Section>
-      <SelectMenu
-        bind:menuItems={extensionOptions}
-        on:change={(e) => {
-          imageConfig.extension = e.detail.value;
-          _onChangeConfig();
-        }}
-      />
-    </div>
+<div class="grid grid-cols-2 gap-2">
+  <div class="grid grid-rows-2">
+    <Section>Image size</Section>
+    <Input
+      type="text"
+      placeholder="E.g. 2x, 64w, 200h"
+      disabled={!imageConfig.extension || imageConfig.extension === "SVG"}
+      bind:value={imageConfig.sizeConstraint}
+      on:input={(e) => {
+        imageConfig.sizeConstraint = e.target["value"];
+        _onChangeConfig();
+      }}
+    />
+  </div>
+  <div class="grid grid-rows-2">
+    <Section>File type</Section>
+    <SelectMenu
+      items={extensionOptions}
+      selectedItemId={imageConfig.extension}
+      placeholder={"Choose one"}
+      onChangeSelectedItem={(itemId) => {
+        imageConfig.extension = itemId;
+        _onChangeConfig();
+      }}
+    />
   </div>
 </div>

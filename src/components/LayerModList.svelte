@@ -1,10 +1,8 @@
 <script lang="ts" type="module">
-  import { Type, Section, IconPlus } from "figma-plugin-ds-svelte";
+  import { Type, Section, IconButton, Divider } from "figma-svelte-components";
   import { LayerMod, LayerModMatches } from "../types";
   import { randomId } from "../utils";
-  import LayerModItem from "./LayerModItem.svelte";
-  import IconButton from "./IconButton.svelte";
-  import Divider from "./Divider.svelte";
+  import { LayerModItem } from ".";
 
   export let layerMods: LayerMod[];
   export let layerModMatches: LayerModMatches;
@@ -15,7 +13,7 @@
   <div class="flex flex-row gap-2 justify-between">
     <div class="flex flex-col">
       <Section>Layer modifiers</Section>
-      <div class="section-subtitle">
+      <div>
         <Type
           >Modify the exported version of any layer. Match text is evaluated as
           a <a href="https://regex101.com/r/S9wWyf/1" target="_blank"
@@ -25,7 +23,7 @@
       </div>
     </div>
     <IconButton
-      iconName={IconPlus}
+      kind={"plus"}
       onClick={() => {
         const mods = [...layerMods];
         mods.push({ id: randomId() });
@@ -42,7 +40,7 @@
           </div>
         {/if}
 
-        <div class="pl-2">
+        <div>
           <LayerModItem
             {layerMod}
             matchedNodeCount={layerModMatches[layerMod.id] ?? 0}

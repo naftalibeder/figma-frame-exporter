@@ -32,8 +32,10 @@ export const layerProperties = [
 ] as const;
 export type LayerProperty = (typeof layerProperties)[number];
 
+export type ConfigId = string;
+
 export interface Config extends NameConfig, ImageConfig, LayerModConfig {
-  id: string;
+  id: ConfigId;
   name: string;
   index: number;
 }
@@ -53,34 +55,6 @@ export interface LayerModConfig {
   layerMods: LayerMod[];
 }
 
-export interface ConfigOption {
-  value: string;
-  label: string;
-  group: string | null;
-  selected: boolean;
-}
-
-export interface CasingOption {
-  value: Casing;
-  label: string;
-  group: string | null;
-  selected: boolean;
-}
-
-export interface ExtensionOption {
-  value: Extension;
-  label: string;
-  group: string | null;
-  selected: boolean;
-}
-
-export interface LayerPropertyOption {
-  value: LayerProperty;
-  label: string;
-  group: string | null;
-  selected: boolean;
-}
-
 export interface Size {
   width: number;
   height: number;
@@ -89,7 +63,7 @@ export interface Size {
 export interface LayerMod {
   id: string;
   query?: string;
-  property?: "cornerRadius" | "visible";
+  property?: LayerProperty;
   value?: any;
 }
 
