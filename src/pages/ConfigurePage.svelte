@@ -1,6 +1,6 @@
 <script lang="ts" type="module">
   import { onMount } from "svelte";
-  import JSZip from "../../node_modules/jszip/dist/jszip.min.js";
+  import JSZip from "jszip";
   import { Type, Icon, Divider } from "figma-svelte-components";
   import { store } from "../store";
   import { delay, log } from "../utils";
