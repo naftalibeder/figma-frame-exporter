@@ -192,7 +192,7 @@
     <Divider />
 
     <div
-      class={"flex flex-1 flex-row items-center justify-between pl-4 pr-2 pointer-events-none " +
+      class={"grid grid-cols-2 items-center pl-4 pr-2 pointer-events-none " +
         (exportButtonDisabled
           ? "opacity-50 hover:opacity-60"
           : "opacity-80 hover:opacity-100")}
@@ -200,7 +200,7 @@
       <Type weight="weight-bold">
         {exportLoading ? "Generating export..." : `Export ${nodeCount} images`}
       </Type>
-      <Icon kind={"forward"} />
+      <Icon kind={"right"} />
     </div>
   </button>
 </div>

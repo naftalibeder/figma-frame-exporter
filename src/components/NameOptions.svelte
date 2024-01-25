@@ -22,10 +22,10 @@
 
   let casingOptions: SelectMenuItem<Casing>[] = casingStrings.map((c) => {
     const example = casingMap[c]("quick brown fox");
-    const label = `${toSentenceCase(c)} (${example})`;
     return {
       id: c,
-      label,
+      title: toSentenceCase(c),
+      subtitle: example,
     };
   });
 

@@ -18,7 +18,7 @@
     return sorted.map((config, i) => {
       return {
         id: config.id,
-        label: config.name === "" ? "(No name)" : config.name,
+        title: config.name === "" ? "(No name)" : config.name,
       };
     });
   })(configs);

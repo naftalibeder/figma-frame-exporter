@@ -206,7 +206,7 @@
       </div>
       <div class="space-y-4 mt-4">
         <Input
-          className={"flex flex-1"}
+          class={"flex flex-1"}
           placeholder={"Configuration code"}
           value={code}
           on:focus={onCodeInputFocus}

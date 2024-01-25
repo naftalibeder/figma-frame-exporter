@@ -11,10 +11,10 @@
   export let onChange: (iomageConfig: ImageConfig) => void;
 
   const extensionOptions: SelectMenuItem<Extension>[] = [
-    { id: "PNG", label: "PNG" },
-    { id: "JPG", label: "JPG" },
-    { id: "SVG", label: "SVG" },
-    { id: "PDF", label: "PDF" },
+    { id: "PNG", title: "PNG" },
+    { id: "JPG", title: "JPG" },
+    { id: "SVG", title: "SVG" },
+    { id: "PDF", title: "PDF" },
   ];
 
   const _onChangeConfig = () => {

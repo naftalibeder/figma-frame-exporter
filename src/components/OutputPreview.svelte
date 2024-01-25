@@ -35,7 +35,7 @@
 
         <div class="flex flex-row content-between items-center gap-2 py-2">
           <img class="w-4 h-4" src={exampleAsset.url} alt="asset thumbnail" />
-          <Type className="flex flex-1 whitespace-nowrap overflow-hidden">
+          <Type class="flex flex-1 whitespace-nowrap overflow-hidden">
             {exampleAsset.filename}.{exampleAsset.extension.toLowerCase()}
           </Type>
           {#if exampleAsset.size}

@@ -22,7 +22,7 @@
     layerProperties.map((o) => {
       return {
         id: o,
-        label: o,
+        title: o,
       };
     });
 </script>
@@ -35,7 +35,7 @@
       </div>
       <div class="flex flex-1 relative">
         <Input
-          className="flex flex-1"
+          class="flex flex-1"
           placeholder="Layers matching..."
           bind:value={layerMod.query}
           on:input={(e) => {
@@ -71,7 +71,7 @@
         </div>
         <Type>to</Type>
         <Input
-          className="w-[80]"
+          class="w-[80]"
           placeholder="Value"
           bind:value={layerMod.value}
           on:input={(e) => {
