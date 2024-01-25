@@ -1,6 +1,7 @@
 # 18
 
-- Maintenance update
+- Major maintenance update
+- Visual refresh
 
 # 17
 
