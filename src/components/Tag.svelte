@@ -11,11 +11,11 @@
 <style>
   div {
     color: var(--figma-color-text-tertiary);
-    outline-color: var(--figma-color-text-tertiary);
+    outline-color: var(--figma-color-border);
   }
 
   div:hover {
     color: var(--figma-color-text);
-    outline-color: var(--figma-color-text);
+    outline-color: var(--figma-color-text-tertiary);
   }
 </style>

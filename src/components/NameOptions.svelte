@@ -14,8 +14,8 @@
   export let onChange: (_nameConfig: NameConfig) => void;
 
   const syntaxVars = [
-    ["$F", "Frame name"],
-    ["$V", "Variant names"],
+    ["$F", "+ Frame name"],
+    ["$V", "+ Variant names"],
   ];
 
   let lastSyntaxCursorIndex = 0;
