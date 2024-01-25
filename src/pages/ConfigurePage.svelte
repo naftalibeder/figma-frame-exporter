@@ -183,16 +183,16 @@
     </div>
   </div>
 
+  <Divider />
+
   <button
     class="flex flex-col justify-center w-full h-16"
     style="background-color: var(--figma-color-bg)"
     disabled={exportButtonDisabled}
     on:click={onSelectExport}
   >
-    <Divider />
-
     <div
-      class={"grid grid-cols-2 items-center pl-4 pr-2 pointer-events-none " +
+      class={"grid grid-cols-[1fr_auto] justify-items-start items-center w-full pl-4 pr-2 pointer-events-none " +
         (exportButtonDisabled
           ? "opacity-50 hover:opacity-60"
           : "opacity-80 hover:opacity-100")}
