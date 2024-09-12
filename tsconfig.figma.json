@@ -7,8 +7,16 @@
     "allowJs": true,
     "checkJs": true,
     "isolatedModules": true,
-    "typeRoots": ["./node_modules/@figma"]
+    "typeRoots": [
+      "./node_modules/@figma"
+    ]
   },
-  "include": ["main.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "main.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

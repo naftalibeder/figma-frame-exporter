@@ -4,9 +4,14 @@
   "api": "1.0.0",
   "capabilities": [],
   "enableProposedApi": false,
-  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "editorType": [
+    "figma"
+  ],
   "networkAccess": {
-    "allowedDomains": ["none"]
+    "allowedDomains": [
+      "none"
+    ]
   },
   "ui": "dist/index.html",
   "main": "dist/main.js"

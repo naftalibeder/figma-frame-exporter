@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "postinstall": "npx patch-package",
     "dev": "vite",
     "build": "rm -rf dist && npm run build:svelte && npm run build:figma",
     "build:svelte": "vite build -c vite.svelte.config.ts",
@@ -13,7 +12,11 @@
     "check": "svelte-check --tsconfig ./tsconfig.svelte.json"
   },
   "devDependencies": {
-    "@figma/plugin-typings": "^1.84.0",
+    "@figma/plugin-typings": "*",
+    "@figma/eslint-plugin-figma-plugins": "*",
+    "@typescript-eslint/eslint-plugin": "6.12.0",
+    "@typescript-eslint/parser": "6.12.0",
+    "eslint": "8.54.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "@tsconfig/svelte": "^5.0.2",
     "@types/jsdom": "^21.1.6",
@@ -22,13 +25,34 @@
     "js-convert-case": "4.2.0",
     "jsdom": "^23.2.0",
     "jszip": "3.10.1",
-    "patch-package": "^8.0.0",
     "postcss": "^8.4.33",
     "svelte": "^4.2.8",
     "svelte-check": "^3.6.2",
     "tailwindcss": "^3.4.1",
     "tslib": "^2.6.2",
-    "typescript": "^5.2.2",
+    "typescript": "^5.3.2",
     "vite": "^5.0.8"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@figma/figma-plugins/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    },
+    "root": true,
+    "rules": {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }
+      ]
+    }
   }
 }

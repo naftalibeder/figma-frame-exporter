@@ -1,0 +1,5 @@
+// This file exists as a passthrough, so vscode can use it for linting in the
+// integrated terminal. No build step relies on it.
+{
+  "extends": "./tsconfig.figma.json"
+}

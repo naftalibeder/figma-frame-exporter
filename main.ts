@@ -49,14 +49,14 @@ const getStore = async (): Promise<Store> => {
   const configEntries = Object.entries(store.configs);
 
   // Migrate order indices if needed.
-  if (configEntries.some(([k, v]) => v.index === undefined)) {
-    configEntries.forEach(([k, v], i) => {
+  if (configEntries.some(([_, v]) => v.index === undefined)) {
+    configEntries.forEach(([k, _], i) => {
       store.configs[k].index = i;
     });
   }
 
   // Migrate connectors if needed.
-  configEntries.forEach(([k, v], i) => {
+  configEntries.forEach(([k, v]) => {
     if (v["connectors"]) {
       const connector = v["connectors"]["between"];
       store.configs[k].connector = connector;
@@ -94,7 +94,6 @@ class TempFrame {
     this.frame = figma.createFrame();
     this.frame.name = "[Frame Exporter]";
     this.frame.clipsContent = false;
-    this.frame = this.frame;
   };
 
   remove = () => {
@@ -124,7 +123,7 @@ const getExportables = (): Exportable[] => {
 
       for (const child of children) {
         const variantProperties = child.variantProperties;
-        let variants: VariantInstance[] = Object.entries(variantProperties).map(
+        const variants: VariantInstance[] = Object.entries(variantProperties).map(
           ([k, v]) => {
             return {
               type: variantPropertyTypes[k],
@@ -176,7 +175,7 @@ const getExportPayload = async (
 
   tempFrame.create();
 
-  let layerModMatches: LayerModMatches = {};
+  const layerModMatches: LayerModMatches = {};
   for (const layerMod of layerMods) {
     layerModMatches[layerMod.id] = 0;
   }
@@ -188,7 +187,7 @@ const getExportPayload = async (
     exportablesToUse = exportables.slice();
   }
 
-  let assets: Asset[] = [];
+  const assets: Asset[] = [];
 
   for (const e of exportablesToUse) {
     const asset: Asset = {
@@ -198,7 +197,8 @@ const getExportPayload = async (
       data: new Uint8Array(),
     };
 
-    let node = figma.getNodeById(e.id) as FrameNode;
+    // @ts-expect-error function exists but is not in typings file
+    let node = await figma.getNodeByIdAsync(e.id) as FrameNode;
 
     // Modify node or its children if matched by a layer mod's query.
     for (const layerMod of layerMods) {
@@ -260,7 +260,7 @@ const getExportPayload = async (
       const payload = buildExportSettings(baseExportConfig);
       settings = payload.settings;
     } else {
-      let displayPayload = buildExportSettings(baseExportConfig);
+      const displayPayload = buildExportSettings(baseExportConfig);
       asset.size = displayPayload.destSize;
       const payload = buildExportSettings({
         extension: "PNG",
@@ -317,7 +317,7 @@ const withLayerMods = (
     try {
       const _type = typeof n[property];
 
-      let _value: any;
+      let _value: number | boolean;
       if (_type === "number") {
         _value = parseFloat(value);
       } else if (_type === "boolean") {
