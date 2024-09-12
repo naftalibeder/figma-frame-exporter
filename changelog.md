@@ -1,3 +1,8 @@
+# 19
+
+- Sped up initial load
+- Maintenance update
+
 # 18
 
 - Major maintenance update
